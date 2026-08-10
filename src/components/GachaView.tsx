@@ -112,9 +112,7 @@ export default function GachaView({
         >
           <ArrowLeft className="w-6 h-6 text-slate-700" />
         </button>
-        <h2 className="text-xl font-black text-slate-800">
-          ─── 🎰 扭蛋機 ───
-        </h2>
+        <div className="w-10"></div>
         <div className="w-10"></div>
       </div>
 

@@ -453,7 +453,7 @@ function MainAppContent() {
       saveCatFood(1);
     }
 
-    showToast(`🎉 成功領養小精靈【${finalName}】！每日記錄心情可獲得貓糧 🐟 喔！`);
+    showToast(`🎉 成功領養小精靈【${finalName}】！每日記錄心情可獲得食物或玩具 🐟 喔！`);
   };
 
   const handleFeedCat = (): boolean => {

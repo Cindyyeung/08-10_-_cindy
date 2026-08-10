@@ -153,9 +153,9 @@ export default function AnimatedPlant({
   let potLipFill = '#e78b72';
 
   if (potTheme === 'rainbow') {
-    potFill = '#ffb3ba'; // pastel pink
-    potStroke = '#ff6b81';
-    potLipFill = '#ffc8cd';
+    potFill = 'url(#rainbowPotGrad)';
+    potStroke = '#706fd3';
+    potLipFill = 'url(#rainbowPotLipGrad)';
   } else if (potTheme === 'star') {
     potFill = '#ffeaa7'; // soft yellow
     potStroke = '#fdcb6e';
@@ -433,6 +433,25 @@ export default function AnimatedPlant({
             <stop offset="0%" stopColor="#ff8a80" />
             <stop offset="60%" stopColor="#e53935" />
             <stop offset="100%" stopColor="#c62828" />
+          </linearGradient>
+
+          {/* 🌈 Rainbow Pot Gradient (Red, Orange, Yellow, Green, Cyan, Blue, Violet) */}
+          <linearGradient id="rainbowPotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ff5e57" />
+            <stop offset="18%" stopColor="#ffdd59" />
+            <stop offset="36%" stopColor="#0be881" />
+            <stop offset="55%" stopColor="#4bcffa" />
+            <stop offset="78%" stopColor="#575fcf" />
+            <stop offset="100%" stopColor="#ef5777" />
+          </linearGradient>
+
+          <linearGradient id="rainbowPotLipGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#ff3f34" />
+            <stop offset="20%" stopColor="#ffa801" />
+            <stop offset="40%" stopColor="#ffd32a" />
+            <stop offset="60%" stopColor="#05c46b" />
+            <stop offset="80%" stopColor="#0fbcf9" />
+            <stop offset="100%" stopColor="#3c40c6" />
           </linearGradient>
 
           {/* 🧚‍♀️ Fairy Cottage Roof Gradient (Soft Pink to Lavender Purple) */}
@@ -1862,10 +1881,11 @@ export default function AnimatedPlant({
 
         {/* Pot decorations based on theme */}
         {potTheme === 'rainbow' && (
-          <g transform="translate(85, 195)">
-            <path d="M-5,10 A 10,10 0 0,1 25,10" fill="none" stroke="#ffdfba" strokeWidth="3" />
-            <path d="M-1,10 A 6,6 0 0,1 21,10" fill="none" stroke="#ffffba" strokeWidth="3" />
-            <path d="M3,10 A 2,2 0 0,1 17,10" fill="none" stroke="#baffc9" strokeWidth="3" />
+          <g transform="translate(100, 208)">
+            <path d="M-16,0 A 16,16 0 0,1 16,0" fill="none" stroke="#ff4d4d" strokeWidth="3" strokeLinecap="round" />
+            <path d="M-12,0 A 12,12 0 0,1 12,0" fill="none" stroke="#fffa65" strokeWidth="3" strokeLinecap="round" />
+            <path d="M-8,0 A 8,8 0 0,1 8,0" fill="none" stroke="#32ff7e" strokeWidth="3" strokeLinecap="round" />
+            <path d="M-4,0 A 4,4 0 0,1 4,0" fill="none" stroke="#18dcff" strokeWidth="3" strokeLinecap="round" />
           </g>
         )}
         {potTheme === 'star' && (

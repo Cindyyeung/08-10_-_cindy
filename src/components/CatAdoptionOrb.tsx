@@ -88,9 +88,9 @@ export default function CatAdoptionOrb({ onAdoptComplete, isIpad = false }: CatA
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.85 }}
               onClick={handleClaim}
-              className="px-2.5 py-0.5 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white rounded-full text-[11px] font-black shadow-xs flex items-center gap-1 active:scale-95 transition cursor-pointer border-0 animate-bounce whitespace-nowrap"
+              className="px-2.5 py-0.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-500 hover:to-amber-500 text-white rounded-full text-[11px] font-black shadow-[0_2px_10px_rgba(250,204,21,0.5)] flex items-center gap-1 active:scale-95 transition cursor-pointer border-0 animate-bounce whitespace-nowrap"
             >
-              <Sparkles className="w-3 h-3 fill-white" />
+              <Sparkles className="w-3 h-3 fill-yellow-100 text-yellow-100" />
               <span>{language === 'en' ? 'Claim' : '領取'}</span>
             </motion.button>
           </div>
@@ -168,22 +168,32 @@ export default function CatAdoptionOrb({ onAdoptComplete, isIpad = false }: CatA
             }
             onClick={stage === 1 ? handleClaim : undefined}
           >
-            {/* Soft Ambient Radial Light Glow behind Orb */}
+            {/* Soft Ambient Radial Golden Light Glow behind Orb */}
             <motion.div
-              className="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-200/60 via-orange-200/50 to-pink-200/60 blur-md pointer-events-none"
+              className="absolute inset-0 rounded-full bg-gradient-to-tr from-yellow-300/80 via-amber-300/70 to-yellow-100/90 blur-md pointer-events-none"
               animate={
                 stage === 2
-                  ? { opacity: [0.3, 1, 0.4, 1], scale: [1, 1.25, 1.1, 1.3] }
-                  : { opacity: [0.4, 0.8, 0.4], scale: [0.95, 1.05, 0.95] }
+                  ? { opacity: [0.4, 1, 0.5, 1], scale: [1, 1.3, 1.15, 1.35] }
+                  : { opacity: [0.5, 0.9, 0.5], scale: [0.95, 1.08, 0.95] }
               }
               transition={{ repeat: Infinity, duration: stage === 2 ? 0.4 : 2, ease: 'easeInOut' }}
             />
 
-            {/* Orb Sphere Body (Approx 1/3 plant size: ~72px wide) */}
-            <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-white/45 backdrop-blur-xs border-2 border-amber-300/80 shadow-[0_8px_20px_rgba(251,191,36,0.3)] relative flex items-center justify-center overflow-hidden">
+            {/* Golden Radiant Light Ray Burst during Birth/Hatching */}
+            {(stage === 2 || stage === 3) && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: [0, 1, 0.8, 0], scale: [0.5, 1.8, 2.3] }}
+                transition={{ duration: 1.2, ease: 'easeOut' }}
+                className="absolute inset-0 m-auto w-24 h-24 rounded-full bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-200 blur-lg pointer-events-none z-30"
+              />
+            )}
+
+            {/* Orb Sphere Body */}
+            <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-white/50 backdrop-blur-xs border-2 border-yellow-400 shadow-[0_0_22px_rgba(250,204,21,0.55)] relative flex items-center justify-center overflow-hidden">
               
-              {/* Inner Soft Glowing Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-b from-amber-100/40 via-orange-100/30 to-pink-100/40 rounded-full" />
+              {/* Inner Soft Golden Glowing Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-b from-yellow-200/60 via-amber-100/50 to-yellow-100/60 rounded-full" />
 
               {/* Cat Silhouette inside the Orb */}
               <motion.div
@@ -219,7 +229,7 @@ export default function CatAdoptionOrb({ onAdoptComplete, isIpad = false }: CatA
           </motion.div>
         )}
 
-        {/* STAGES 4, 5: Cat Emerges from Light & Bounces on Landing */}
+        {/* STAGES 4, 5: Cat Emerges from Golden Light & Bounces on Landing */}
         {(stage === 4 || stage === 5) && (
           <motion.div
             initial={{ opacity: 0, scale: 0.3, y: -25 }}
@@ -227,6 +237,13 @@ export default function CatAdoptionOrb({ onAdoptComplete, isIpad = false }: CatA
             transition={{ duration: 0.8, ease: 'easeOut' }}
             className="relative flex items-center justify-center drop-shadow-md w-full h-full"
           >
+            {/* Golden Birth Light Flare behind Cat */}
+            <motion.div
+              initial={{ scale: 0.2, opacity: 1 }}
+              animate={{ scale: [0.4, 2.2, 1.8], opacity: [1, 0.7, 0] }}
+              transition={{ duration: 1.0, ease: 'easeOut' }}
+              className="absolute w-20 h-20 rounded-full bg-gradient-to-r from-yellow-300 via-amber-300 to-yellow-100 blur-lg pointer-events-none"
+            />
             {/* Cute Cat SVG */}
             <svg viewBox="0 0 100 120" className="w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg">
               <defs>

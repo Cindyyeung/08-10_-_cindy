@@ -7,7 +7,7 @@ export const translations = {
     // Home Greetings
     greeting_morning: '☀️ 早晨，今日慢慢開始',
     greeting_afternoon: '🍵 午安，放慢腳步稍息一下',
-    greeting_evening: '🌙 晚安，今天你辛苦了，好好休息',
+    greeting_evening: '🌙 晚安，好好休息',
     speak_greeting: '朗讀問候語',
     
     // Home Cards & Buttons

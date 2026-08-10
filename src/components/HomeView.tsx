@@ -154,13 +154,13 @@ export default function HomeView({
   return (
     <div className={`flex-1 flex flex-col ${isIpad ? 'space-y-4 py-3 px-6 overflow-y-auto overflow-x-hidden pb-6' : 'space-y-2 py-1 px-1 overflow-y-auto overflow-x-hidden -mt-1 pb-4'}`}>
       {/* Card 1: Dynamic Greeting Card with Language Switcher at Top Right */}
-      <div className={`bg-[#f9f7f2] rounded-2xl border-2 border-brand-sand/60 shadow-xs flex items-center justify-between shrink-0 relative ${isIpad ? 'px-6 py-3.5' : 'px-4 py-2'}`}>
-        <h1 className={`${isIpad ? 'text-lg md:text-xl' : 'text-[14px] sm:text-[15px]'} font-black text-brand-moss font-sans tracking-tight`}>
+      <div className={`bg-[#f9f7f2] rounded-2xl border-2 border-brand-sand/60 shadow-xs flex items-center justify-between shrink-0 relative ${isIpad ? 'px-6 py-3.5' : 'px-3 py-1.5 sm:px-4 sm:py-2'}`}>
+        <h1 className={`${isIpad ? 'text-lg md:text-xl' : 'text-[11.5px] min-[360px]:text-[12.5px] min-[390px]:text-[13.5px] sm:text-[15px]'} font-black text-brand-moss font-sans tracking-tight whitespace-nowrap overflow-hidden text-ellipsis min-w-0 pr-1`}>
           {greeting}
         </h1>
 
         {/* Top Right Actions: Language Switcher Dropdown + Audio Button */}
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center shrink-0 ${isIpad ? 'gap-2' : 'gap-1'}`}>
           {/* Language Switcher Dropdown Button */}
           <div className="relative" ref={langDropdownRef}>
             <button
@@ -170,14 +170,14 @@ export default function HomeView({
                 playClickSound(520, 'sine');
                 setIsLangOpen(!isLangOpen);
               }}
-              className={`flex items-center gap-1.5 px-2.5 py-1 bg-white border-2 border-brand-sand/80 hover:border-brand-sage/60 rounded-full text-xs font-black text-brand-moss shadow-2xs transition active:scale-95 cursor-pointer ${
-                isIpad ? 'h-9 px-3 text-xs' : 'h-8 text-[11px]'
+              className={`flex items-center bg-white border-2 border-brand-sand/80 hover:border-brand-sage/60 rounded-full font-black text-brand-moss shadow-2xs transition active:scale-95 cursor-pointer ${
+                isIpad ? 'h-9 px-3 text-xs gap-1.5' : 'h-7 px-2 text-[10px] gap-1'
               }`}
               title={t('select_language')}
             >
-              <Globe className={isIpad ? 'w-4 h-4 text-brand-sage' : 'w-3.5 h-3.5 text-brand-sage'} />
+              <Globe className={isIpad ? 'w-4 h-4 text-brand-sage' : 'w-3 h-3 text-brand-sage'} />
               <span>{language === 'zh' ? '中文' : 'EN'}</span>
-              <ChevronDown className={`w-3 h-3 text-brand-moss/70 transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`text-brand-moss/70 transition-transform duration-200 ${isIpad ? 'w-3 h-3' : 'w-2.5 h-2.5'} ${isLangOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Dropdown Menu */}
@@ -229,11 +229,13 @@ export default function HomeView({
           <button
             type="button"
             onClick={handleSpeakGreeting}
-            className="p-2 rounded-full hover:bg-brand-sand text-brand-moss transition active:scale-90 cursor-pointer"
+            className={`rounded-full hover:bg-brand-sand text-brand-moss transition active:scale-90 cursor-pointer flex items-center justify-center shrink-0 ${
+              isIpad ? 'p-2' : 'p-1'
+            }`}
             title={t('speak_greeting')}
-            style={{ minHeight: isIpad ? '48px' : '40px', minWidth: isIpad ? '48px' : '40px' }}
+            style={{ minHeight: isIpad ? '48px' : '32px', minWidth: isIpad ? '48px' : '32px' }}
           >
-            <Volume2 className={isIpad ? 'w-6 h-6' : 'w-4.5 h-4.5'} />
+            <Volume2 className={isIpad ? 'w-6 h-6' : 'w-4 h-4'} />
           </button>
         </div>
       </div>

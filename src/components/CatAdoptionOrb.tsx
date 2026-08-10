@@ -59,24 +59,24 @@ export default function CatAdoptionOrb({ onAdoptComplete, isIpad = false }: CatA
 
   return (
     <div
-      className={`absolute ${isIpad ? 'bottom-6 right-6' : 'bottom-4 right-3'} z-40 flex flex-col items-center justify-end select-none pointer-events-auto`}
+      className={`absolute ${isIpad ? 'bottom-6 right-6' : 'bottom-1 right-0 sm:right-2'} z-40 flex flex-col items-center justify-end select-none pointer-events-auto`}
       style={{ touchAction: 'none' }}
       onClick={(e) => e.stopPropagation()}
     >
       {/* Dialogue / Subtitle Overlay above the Orb */}
       <AnimatePresence mode="wait">
         {stage === 1 && (
-          <div className="flex flex-col items-center z-50 relative">
+          <div className="flex flex-col items-center z-50 relative gap-0.5 -mb-0.5">
             <motion.div
               key="stage1-bubble"
               initial={{ opacity: 0, y: 8, scale: 0.85 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.85 }}
-              className="mb-2 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-md border-2 border-amber-300/80 relative max-w-[210px] text-center"
+              className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-xs border-2 border-amber-300/80 relative max-w-[190px] text-center"
             >
-              <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-amber-300/80 rotate-45"></div>
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-xs font-black text-amber-900 leading-snug">
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-b-2 border-r-2 border-amber-300/80 rotate-45"></div>
+              <div className="flex flex-col items-center">
+                <span className="text-[11px] sm:text-xs font-black text-amber-900 leading-tight whitespace-nowrap">
                   {language === 'en' ? 'Looks like there\'s a little spirit inside⋯' : '入面好似有隻小精靈喺度⋯'}
                 </span>
               </div>
@@ -88,9 +88,9 @@ export default function CatAdoptionOrb({ onAdoptComplete, isIpad = false }: CatA
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.85 }}
               onClick={handleClaim}
-              className="mt-1 mb-1 px-3 py-1 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white rounded-full text-xs font-black shadow-sm flex items-center gap-1 active:scale-95 transition cursor-pointer border-0 animate-bounce"
+              className="px-2.5 py-0.5 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white rounded-full text-[11px] font-black shadow-xs flex items-center gap-1 active:scale-95 transition cursor-pointer border-0 animate-bounce whitespace-nowrap"
             >
-              <Sparkles className="w-3.5 h-3.5 fill-white" />
+              <Sparkles className="w-3 h-3 fill-white" />
               <span>{language === 'en' ? 'Claim' : '領取'}</span>
             </motion.button>
           </div>
@@ -102,10 +102,10 @@ export default function CatAdoptionOrb({ onAdoptComplete, isIpad = false }: CatA
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="mb-2 bg-amber-50/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-md border-2 border-amber-400 z-50 relative max-w-[210px] text-center"
+            className="mb-1 bg-amber-50/95 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-xs border-2 border-amber-400 z-50 relative max-w-[190px] text-center"
           >
-            <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-amber-50 border-b-2 border-r-2 border-amber-400 rotate-45"></div>
-            <span className="text-xs font-black text-amber-900 leading-snug animate-pulse">
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-amber-50 border-b-2 border-r-2 border-amber-400 rotate-45"></div>
+            <span className="text-[11px] sm:text-xs font-black text-amber-900 leading-tight animate-pulse whitespace-nowrap">
               {language === 'en' ? 'It\'s almost coming out! So excited!' : '就快出嚟啦！好期待呀！'}
             </span>
           </motion.div>
@@ -117,10 +117,10 @@ export default function CatAdoptionOrb({ onAdoptComplete, isIpad = false }: CatA
             initial={{ opacity: 0, y: 10, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="mb-2 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-md border-2 border-brand-sage z-50 relative max-w-[210px] text-center"
+            className="mb-1 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-xs border-2 border-brand-sage z-50 relative max-w-[190px] text-center"
           >
-            <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-brand-sage rotate-45"></div>
-            <span className="text-xs font-black text-brand-moss leading-snug">
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-b-2 border-r-2 border-brand-sage rotate-45"></div>
+            <span className="text-[11px] sm:text-xs font-black text-brand-moss leading-tight whitespace-nowrap">
               {language === 'en' ? 'Meow~! So happy to meet you at last!' : '喵～！終於見到你啦！'}
             </span>
           </motion.div>

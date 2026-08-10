@@ -1,0 +1,1018 @@
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { SOS_EXERCISES } from '../moodsData';
+import { playClickSound, startCalmingDrone, stopCalmingDrone, speakText, stopSpeaking } from '../utils/audio';
+import { ShieldAlert, Wind, Eye, Music, Volume2, VolumeX, HelpCircle, Sparkles, CheckCircle2, RefreshCw, Play, Square } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
+
+const HAVEN_PASSAGES = [
+  {
+    title: "課後放鬆",
+    guide: "想像你完成了一天的學習，正坐在最舒服的小椅子上。試著把肩膀放鬆下來，喝一口溫暖的水，深深地吐出一口氣。現在不需要擔心任何作業或考試，這是專屬於你的放鬆時間。",
+    quote: "「你今天已經非常努力了！不論做得怎麼樣，都給自己一個大大的讚。」"
+  },
+  {
+    title: "溫暖小抱枕",
+    guide: "想像你抱著一個又軟又暖的大抱枕，或是你最喜歡的毛絨玩偶。你可以把頭輕輕靠在上面，聽聽自己平穩的呼吸聲。軟綿綿的抱枕正溫柔地支撐著你，讓你感到無比心晴。",
+    quote: "「有各種情緒都是很正常的。累了就抱抱自己，休息一下再出發。」"
+  },
+  {
+    title: "看窗外綠樹",
+    guide: "想像你正靜靜地看著窗外的大樹，綠色的樹葉在微風中輕輕搖擺，小鳥在樹枝上跳躍。深深吸一口氣，感覺自己就像小樹一樣，在溫暖的陽光下安靜、有力量地成長。",
+    quote: "「就像樹木慢慢長大一樣，給自己一點時間，你可以照著自己的節奏進步。」"
+  },
+  {
+    title: "心晴小房間",
+    guide: "想像你正待在一個最舒服、最安全的房間裡。裡面放著你喜歡的書本和玩具，燈光柔和又溫暖。這裡非常安靜，你可以隨心所欲地休息，感覺身體完全放鬆下來。",
+    quote: "「遇到困難時沒關係，你可以隨時回到這個安靜的地方，讓心平靜下來。」"
+  },
+  {
+    title: "喝口溫暖的水",
+    guide: "想像你雙手握著一杯溫暖的水，慢慢喝下一口。感覺溫熱的水流進肚子裡，把全身的緊張和不開心都慢慢帶走。你可以再做一次深呼吸，感受身體變得很放鬆、很舒服。",
+    quote: "「照顧好自己的身體和心情，就是每天最重要、最棒的一件事。」"
+  },
+  {
+    title: "快樂隨意畫",
+    guide: "想像你拿著彩色的畫筆，在白紙上隨意畫出喜歡的圖案與漂亮的顏色。不需要在乎畫得好不好看，只要享受畫畫時這種自由又快樂的感覺，把所有心情都畫出來。",
+    quote: "「每個人都是獨一無二的，做最真實、最可愛的你自己就非常好。」"
+  },
+  {
+    title: "漫步小綠洲",
+    guide: "想像你走在校園的小小花園裡，腳下是柔軟的小草，微風迎面吹來，撫平了一整天上課的疲倦。你可以放慢腳步，感受陽光灑在身上的微微溫熱，深深吸一口帶著草香的空氣。",
+    quote: "「不用總是急著奔跑，偶爾停下腳步看看風景，你已經走得非常穩了。」"
+  },
+  {
+    title: "聽微風與雨聲",
+    guide: "想像午後下起了一場輕柔的小雨，雨滴輕輕拍打在窗玻璃上，發出沙沙的療癒聲音。你坐在溫暖的室內，靜靜看著雨水帶走空氣中的灰塵，感覺自己的心情也跟著變得特別乾淨、舒暢。",
+    quote: "「就像雨後天空會出彩虹一樣，給心情一點時間，一切都會變得清爽平靜。」"
+  }
+];
+
+const HAVEN_PASSAGES_EN = [
+  {
+    title: "After-school Relaxation",
+    guide: "Imagine you have finished a long day of learning and are sitting in your favorite cozy chair. Try relaxing your shoulders, taking a sip of warm water, and exhaling deeply. There's no need to worry about homework or exams right now; this is your personal relaxation time.",
+    quote: "“You worked so hard today! No matter how it went, give yourself a big high five.”"
+  },
+  {
+    title: "Warm Plush Pillow",
+    guide: "Imagine hugging a soft, warm cushion or your favorite stuffed toy. Gently rest your head against it and listen to your calm, steady breath. The fluffy pillow gently supports you, bringing warmth to your heart.",
+    quote: "“Having all kinds of emotions is completely normal. When you're tired, hug yourself and take a break.”"
+  },
+  {
+    title: "Gazing at Green Trees",
+    guide: "Imagine quietly watching a big green tree outside the window, its leaves gently swaying in the breeze as little birds hop on the branches. Take a deep breath and feel yourself growing quietly and strongly under the warm sun, just like the tree.",
+    quote: "“Just like trees growing step by step, give yourself time. You can progress at your own pace.”"
+  },
+  {
+    title: "Cozy Haven Room",
+    guide: "Imagine staying in the most comfortable, safe room. It's filled with your favorite books and toys, with soft, gentle lighting. It is peaceful and quiet here. You can rest as much as you like, feeling your body fully relax.",
+    quote: "“It's okay to face difficulties. You can return to this peaceful haven anytime to calm your heart.”"
+  },
+  {
+    title: "Sip of Warm Water",
+    guide: "Imagine holding a warm cup of water with both hands and taking a slow sip. Feel the warmth flowing into your chest, gently melting away all tension and worries. Take another deep breath, feeling relaxed and comfortable.",
+    quote: "“Taking good care of your body and mind is the most important and wonderful thing every day.”"
+  },
+  {
+    title: "Doodling Joyfully",
+    guide: "Imagine picking up colorful crayons and freely drawing whatever patterns and bright colors you like on paper. Don't worry about perfection; simply enjoy the freedom and joy of creating, expressing all your feelings.",
+    quote: "“Everyone is unique and special. Being your true, lovely self is wonderful.”"
+  },
+  {
+    title: "Strolling in the Oasis",
+    guide: "Imagine walking through a quiet garden with soft grass underfoot and a gentle breeze brushing past your cheeks, soothing away tiredness. Slow down your steps, feel the gentle warmth of the sun, and take a deep breath of fresh air.",
+    quote: "“No need to rush through life. Pausing to enjoy the view shows how steady and well you are walking.”"
+  },
+  {
+    title: "Breeze and Gentle Rain",
+    guide: "Imagine a gentle afternoon rain tapping lightly against the window pane with a soothing sound. You sit comfortably inside, watching the rain wash away the dust outside, feeling your spirit become clear, clean, and refreshed.",
+    quote: "“Just as a rainbow appears after rain, give your heart a little time, and everything will grow bright and clear.”"
+  }
+];
+
+interface FirstAidViewProps {
+  onGoToHome?: () => void;
+  onAwardFirstAidPoint?: () => boolean;
+  isIpad?: boolean;
+}
+
+export default function FirstAidView({ onGoToHome, onAwardFirstAidPoint, isIpad = false }: FirstAidViewProps) {
+  const { language, t } = useLanguage();
+  const passages = language === 'en' ? HAVEN_PASSAGES_EN : HAVEN_PASSAGES;
+
+  const [activeTool, setActiveTool] = useState<'breathing' | 'grounding' | 'haven'>('breathing');
+  const [isDroneActive, setIsDroneActive] = useState(false);
+  const [pointEarnedNotice, setPointEarnedNotice] = useState(false);
+
+  // Safe Haven States
+  const [isGuiding, setIsGuiding] = useState(false);
+  const [currentPassageIdx, setCurrentPassageIdx] = useState<number>(0);
+
+  // Breathing States
+  const [breathingPhase, setBreathingPhase] = useState<'idle' | 'inhale' | 'hold1' | 'exhale' | 'hold2' | 'completed'>('idle');
+  const [breathingTimer, setBreathingTimer] = useState(0);
+  const [breathingCycleCount, setBreathingCycleCount] = useState(0);
+  const breathingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Grounding states
+  const [groundingStep, setGroundingStep] = useState(1);
+  const [groundingChecked, setGroundingChecked] = useState<Record<number, boolean>>({});
+  const [isGroundingStarted, setIsGroundingStarted] = useState(false);
+  const [isGroundingFinished, setIsGroundingFinished] = useState(false);
+
+  // Voice Enable States (Muted by default)
+  const [isVoiceEnabled, setIsVoiceEnabledState] = useState(false);
+  const isVoiceEnabledRef = useRef(false);
+
+  const toggleVoice = (currentTextIfEnabled?: string) => {
+    const nextVal = !isVoiceEnabled;
+    setIsVoiceEnabledState(nextVal);
+    isVoiceEnabledRef.current = nextVal;
+    
+    if (nextVal) {
+      playClickSound(560, 'sine');
+      if (currentTextIfEnabled) {
+        speakText(currentTextIfEnabled);
+      }
+    } else {
+      playClickSound(400, 'sine');
+      stopSpeaking();
+    }
+  };
+
+  const safeSpeak = (text: string) => {
+    if (isVoiceEnabledRef.current) {
+      speakText(text);
+    }
+  };
+
+  const clearBreathingTimer = () => {
+    if (breathingIntervalRef.current) {
+      clearInterval(breathingIntervalRef.current);
+      clearTimeout(breathingIntervalRef.current as any);
+      breathingIntervalRef.current = null;
+    }
+  };
+
+  // Clean up timers & audio drones on unmount
+  useEffect(() => {
+    return () => {
+      clearBreathingTimer();
+      stopCalmingDrone();
+    };
+  }, []);
+
+  // Breathing loop controller
+  const startBreathingLoop = () => {
+    playClickSound(520, 'sine');
+    setBreathingCycleCount(0);
+    clearBreathingTimer();
+    
+    // Cycle starts with Inhale (4 seconds)
+    runInhalePhase();
+  };
+
+  const stopBreathingLoop = () => {
+    playClickSound(300, 'sine');
+    clearBreathingTimer();
+    setBreathingPhase('idle');
+    setBreathingTimer(0);
+  };
+
+  const runInhalePhase = () => {
+    clearBreathingTimer();
+    setBreathingPhase('inhale');
+    setBreathingTimer(4);
+    safeSpeak(language === 'en' ? 'Breathe in slowly, feel your body relax.' : '慢慢吸氣，感受身體放鬆。');
+    
+    let counter = 4;
+    breathingIntervalRef.current = setInterval(() => {
+      counter--;
+      setBreathingTimer(counter);
+      if (counter <= 0) {
+        clearBreathingTimer();
+        runHold1Phase();
+      }
+    }, 1000);
+  };
+
+  const runHold1Phase = () => {
+    clearBreathingTimer();
+    setBreathingPhase('hold1');
+    setBreathingTimer(4);
+    safeSpeak(language === 'en' ? 'Hold your breath, feel calm inside.' : '閉住呼吸，安頓心靈。');
+
+    let counter = 4;
+    breathingIntervalRef.current = setInterval(() => {
+      counter--;
+      setBreathingTimer(counter);
+      if (counter <= 0) {
+        clearBreathingTimer();
+        runExhalePhase();
+      }
+    }, 1000);
+  };
+
+  const runExhalePhase = () => {
+    clearBreathingTimer();
+    setBreathingPhase('exhale');
+    setBreathingTimer(4);
+    safeSpeak(language === 'en' ? 'Breathe out slowly, release all tension.' : '慢慢呼氣，吐出所有壓力和煩惱。');
+
+    let counter = 4;
+    breathingIntervalRef.current = setInterval(() => {
+      counter--;
+      setBreathingTimer(counter);
+      if (counter <= 0) {
+        clearBreathingTimer();
+        runHold2Phase();
+      }
+    }, 1000);
+  };
+
+  const runHold2Phase = () => {
+    clearBreathingTimer();
+    setBreathingPhase('hold2');
+    setBreathingTimer(4);
+    safeSpeak(language === 'en' ? 'Hold your breath, stay peaceful.' : '閉住呼吸，保持平靜。');
+
+    let counter = 4;
+    breathingIntervalRef.current = setInterval(() => {
+      counter--;
+      setBreathingTimer(counter);
+      if (counter <= 0) {
+        clearBreathingTimer();
+        
+        setBreathingCycleCount((prev) => {
+          const newCount = prev + 1;
+          
+          if (onAwardFirstAidPoint) {
+            const awarded = onAwardFirstAidPoint();
+            if (awarded) setPointEarnedNotice(true);
+          }
+
+          setBreathingPhase('completed');
+          setBreathingTimer(0);
+
+          if (newCount < 3) {
+            safeSpeak(language === 'en' ? `Round ${newCount} complete. Take a short rest for the next round.` : `第 ${newCount} 輪完成。稍作休息，準備下一輪。`);
+            breathingIntervalRef.current = setTimeout(() => {
+              runInhalePhase();
+            }, 2500) as unknown as NodeJS.Timeout;
+          } else {
+            safeSpeak(language === 'en' ? 'Congratulations on completing 3 rounds of breathing practice! Great job!' : '恭喜你完成了三輪呼吸練習，做得太棒了！');
+            breathingIntervalRef.current = setTimeout(() => {
+              setBreathingPhase('idle');
+              setBreathingTimer(0);
+            }, 3000) as unknown as NodeJS.Timeout;
+          }
+
+          return newCount;
+        });
+      }
+    }, 1000);
+  };
+
+  // Toggle synthesized low-frequency calming drone
+  const handleToggleDrone = () => {
+    const nextState = !isDroneActive;
+    setIsDroneActive(nextState);
+    playClickSound(nextState ? 600 : 300, 'sine');
+    if (nextState) {
+      startCalmingDrone();
+    } else {
+      stopCalmingDrone();
+    }
+  };
+
+  const toggleGroundingCheck = (stepNum: number) => {
+    playClickSound(480, 'sine');
+    setGroundingChecked((prev) => ({
+      ...prev,
+      [stepNum]: !prev[stepNum]
+    }));
+  };
+
+  return (
+    <div className="flex-1 flex flex-col p-1 space-y-2.5 h-full overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-1.5">
+          <ShieldAlert className="w-5 h-5 text-brand-terracotta" />
+          <h2 className="text-xl sm:text-2xl font-black text-gray-800 font-sans tracking-tight">
+            {language === 'en' ? 'Rest Stop' : '心晴休息站'}
+          </h2>
+        </div>
+      </div>
+
+      {/* Segmented control for tools */}
+      <div className="grid grid-cols-3 gap-1 p-1 bg-brand-sand rounded-2xl border-2 border-brand-sand shrink-0">
+        {[
+          { id: 'breathing', label: language === 'en' ? 'Breathing' : '呼吸練習', icon: <Wind className="w-4 h-4" /> },
+          { id: 'grounding', label: language === 'en' ? 'Grounding' : '五感著陸', icon: <Eye className="w-4 h-4" /> },
+          { id: 'haven', label: language === 'en' ? 'Haven' : '心晴空間', icon: <HelpCircle className="w-4 h-4" /> }
+        ].map((tool) => (
+          <button
+            key={tool.id}
+            onClick={() => {
+              playClickSound(500, 'sine');
+              setActiveTool(tool.id as any);
+              setIsVoiceEnabledState(false);
+              isVoiceEnabledRef.current = false;
+              stopSpeaking();
+            }}
+            className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition duration-150 cursor-pointer ${
+              activeTool === tool.id
+                ? 'bg-white text-brand-moss font-black shadow-xs'
+                : 'text-gray-600 hover:bg-white/40 font-bold'
+            }`}
+            style={{ minHeight: '40px' }}
+          >
+            {tool.icon}
+            <span className="text-xs sm:text-sm font-sans font-bold tracking-tight mt-0.5">{tool.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Sound drone generator control */}
+      <div className="bg-[#fcfbf9] px-3 py-2 rounded-xl border-2 border-brand-sand/60 shadow-xs flex items-center justify-between gap-2 shrink-0">
+        <div className="flex items-center gap-2">
+          <div className={`p-1.5 rounded-lg transition ${isDroneActive ? 'bg-brand-sage/20 text-brand-moss animate-pulse' : 'bg-gray-100 text-gray-400'}`}>
+            <Music className="w-4 h-4" />
+          </div>
+          <div>
+            <h4 className="text-xs sm:text-sm font-black text-brand-moss">
+              {language === 'en' ? 'Calming Drone' : '療癒共鳴音'}
+            </h4>
+            <p className="text-xs font-bold text-gray-500 leading-tight">
+              {language === 'en' ? 'Soothes mind & brainwaves (Web Audio)' : '幫助腦波平靜 (Web Audio 合鳴)'}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={handleToggleDrone}
+          className={`text-xs px-3 py-1.5 rounded-full font-black border transition duration-200 cursor-pointer ${
+            isDroneActive
+              ? 'bg-brand-sage border-brand-sage text-white shadow-xs'
+              : 'bg-white border-brand-sand/80 text-brand-moss hover:bg-brand-sand/30'
+          }`}
+          style={{ minHeight: '32px' }}
+        >
+          {isDroneActive ? (language === 'en' ? '⏹ Stop' : '⏹ 關閉') : (language === 'en' ? '▶ Play' : '▶ 播放')}
+        </button>
+      </div>
+
+      {/* Main Container Area */}
+      <div className="flex-1 bg-white rounded-2xl border-2 border-brand-sand p-2.5 sm:p-3.5 shadow-sm flex flex-col justify-start sm:justify-center items-center overflow-y-auto sm:overflow-hidden min-h-0">
+        <AnimatePresence mode="wait">
+          {activeTool === 'breathing' && (
+            <motion.div
+              key="breathing"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              className={`w-full flex-1 flex flex-col items-center justify-between sm:justify-center space-y-2 sm:space-y-2.5 ${isIpad ? 'max-w-xl' : 'max-w-md sm:max-w-lg'}`}
+            >
+              <div className="text-center shrink-0 pt-0.5 sm:pt-0">
+                <h3 className={`font-black text-gray-800 ${isIpad ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'}`}>
+                  {language === 'en' ? '🌬️ Box Breathing' : '🌬️ 方形呼吸法'}
+                </h3>
+              </div>
+
+              {/* Dynamic step visual card (Compact rectangular, centered, wider layout) */}
+              <div className={`bg-gradient-to-br from-brand-sand/15 via-white to-brand-sage/10 rounded-2xl border-2 border-brand-sand/80 shadow-xs w-full flex flex-col items-center justify-center ${isIpad ? 'p-3.5 space-y-2.5' : 'p-2.5 sm:p-3 space-y-2'}`}>
+                {/* Timing description inside the card with smaller text */}
+                <div className="bg-brand-sage/10 border border-brand-sage/20 rounded-full px-3 py-0.5 text-center">
+                  <p className={`font-extrabold text-brand-moss ${isIpad ? 'text-xs sm:text-sm' : 'text-[11px] sm:text-xs'}`}>
+                    {language === 'en' ? 'Inhale 4s · Hold 4s · Exhale 4s · Hold 4s' : '吸氣 4 秒 · 閉氣 4 秒 · 呼氣 4 秒 · 閉氣 4 秒'}
+                  </p>
+                </div>
+
+                <p className={`font-black text-gray-700 text-center select-none ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                  {language === 'en' ? 'Breathe along with the expanding box:' : '跟著方形慢慢呼吸，幫助身體放鬆：'}
+                </p>
+                
+                {/* Breathing Visualizer in the center */}
+                <div className="flex justify-center my-0.5">
+                  <div className={`relative flex items-center justify-center ${isIpad ? 'w-24 h-24 sm:w-28 sm:h-28' : 'w-20 h-20 sm:w-22 sm:h-22'}`}>
+                    {/* Outer pulsing ring */}
+                    <motion.div
+                      className="absolute rounded-2xl border-2 border-brand-sage/40"
+                      animate={{
+                        scale:
+                          breathingPhase === 'inhale' ? [1, 1.35] :
+                          breathingPhase === 'hold1' ? 1.35 :
+                          breathingPhase === 'hold2' ? 1 :
+                          breathingPhase === 'completed' ? 1.1 :
+                          breathingPhase === 'exhale' ? [1.35, 1] : 1,
+                        opacity: breathingPhase === 'idle' ? 0.3 : [0.5, 0.9, 0.5]
+                      }}
+                      transition={{
+                        duration: breathingPhase === 'completed' ? 0.5 : 4,
+                        ease: 'easeInOut',
+                        repeat: breathingPhase === 'idle' ? Infinity : 0
+                      }}
+                      style={{ width: '100%', height: '100%' }}
+                    />
+
+                    {/* Main animated ball */}
+                    <motion.div
+                      className={`rounded-2xl flex flex-col items-center justify-center text-center shadow-sm border-2 ${isIpad ? 'w-18 h-18 sm:w-20 sm:h-20' : 'w-14 h-14 sm:w-16 sm:h-16'}`}
+                      style={{
+                        backgroundColor:
+                          breathingPhase === 'inhale' ? '#e2ece3' :
+                          breathingPhase === 'hold1' ? '#fbf4e8' :
+                          breathingPhase === 'exhale' ? '#fbeee9' :
+                          breathingPhase === 'hold2' ? '#eef2f5' :
+                          breathingPhase === 'completed' ? '#d1fae5' : '#f5f1e9',
+                        borderColor:
+                          breathingPhase === 'inhale' ? '#8ca48e' :
+                          breathingPhase === 'hold1' ? '#f2cc8f' :
+                          breathingPhase === 'exhale' ? '#df7a5e' :
+                          breathingPhase === 'hold2' ? '#a5b4c4' :
+                          breathingPhase === 'completed' ? '#34d399' : '#a8bfa9',
+                      }}
+                      animate={{
+                        scale:
+                          breathingPhase === 'inhale' ? [1, 1.35] :
+                          breathingPhase === 'hold1' ? 1.35 :
+                          breathingPhase === 'hold2' ? 1 :
+                          breathingPhase === 'completed' ? 1.1 :
+                          breathingPhase === 'exhale' ? [1.35, 1] : 1,
+                      }}
+                      transition={{
+                        duration: breathingPhase === 'completed' ? 0.5 : 4,
+                        ease: 'linear',
+                      }}
+                    >
+                      <div className="flex flex-col items-center justify-center rounded-full origin-center">
+                        <span className={`font-black text-gray-800 tracking-wider ${isIpad ? 'text-xs sm:text-sm' : 'text-[11px] sm:text-xs'}`}>
+                          {breathingPhase === 'idle' && (language === 'en' ? 'Ready' : '已準備')}
+                          {breathingPhase === 'inhale' && (language === 'en' ? 'Inhale' : '吸氣')}
+                          {breathingPhase === 'hold1' && (language === 'en' ? 'Hold' : '閉氣')}
+                          {breathingPhase === 'hold2' && (language === 'en' ? 'Hold' : '閉氣')}
+                          {breathingPhase === 'exhale' && (language === 'en' ? 'Exhale' : '呼氣')}
+                          {breathingPhase === 'completed' && (language === 'en' ? 'Done' : '完成')}
+                        </span>
+                        {breathingPhase !== 'idle' && breathingPhase !== 'completed' && (
+                          <span className={`font-black text-brand-moss font-mono mt-0.5 ${isIpad ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}>
+                            {breathingTimer}
+                          </span>
+                        )}
+                        {breathingPhase === 'completed' && (
+                          <span className={`font-black text-emerald-700 mt-0.5 ${isIpad ? 'text-xs sm:text-sm' : 'text-[10px] sm:text-xs'}`}>
+                            {breathingCycleCount}/3 {language === 'en' ? 'Rounds' : '輪'}
+                          </span>
+                        )}
+                      </div>
+                    </motion.div>
+                  </div>
+                </div>
+
+                {/* Center status prompt */}
+                <div className={`text-center bg-brand-sand/20 rounded-xl w-full border border-brand-sand/40 ${isIpad ? 'px-3.5 py-2' : 'px-2.5 py-1.5'}`}>
+                  <p className={`font-black text-emerald-800 tracking-tight ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                    {breathingPhase === 'idle' && (language === 'en' ? 'Press Start when you are ready' : '準備好後按下方開始')}
+                    {breathingPhase === 'inhale' && (language === 'en' ? '🌟 Inhale... expand your chest slowly' : '🌟 吸氣...肚子慢慢鼓起來')}
+                    {breathingPhase === 'hold1' && (language === 'en' ? '⏹️ Hold... feel the calm' : '⏹️ 閉住呼吸...平靜感覺')}
+                    {breathingPhase === 'hold2' && (language === 'en' ? '⏹️ Hold... stay peaceful' : '⏹️ 閉住呼吸...保持平靜')}
+                    {breathingPhase === 'exhale' && (language === 'en' ? '🍃 Exhale slowly... release all tension' : '🍃 慢慢呼氣...釋放所有緊繃')}
+                    {breathingPhase === 'completed' && (
+                      breathingCycleCount < 3 
+                        ? (language === 'en' ? `🎉 Round ${breathingCycleCount} complete! Next round in 2s...` : `🎉 完成第 ${breathingCycleCount} 輪！2 秒後自動開始下一輪...`)
+                        : (language === 'en' ? '🎉 3 rounds completed! Great job!' : '🎉 三輪練習已完成！給自己一個掌聲！')
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* Breathing Tool Action Bar */}
+              <div className={`flex gap-2 w-full items-center justify-center mx-auto shrink-0 ${isIpad ? 'max-w-[400px]' : 'max-w-[300px] sm:max-w-[360px]'}`}>
+                {breathingPhase === 'idle' ? (
+                  <button
+                    onClick={startBreathingLoop}
+                    className={`flex-1 py-2 bg-brand-sage hover:bg-brand-moss text-white rounded-full font-black tracking-wider transition shadow-sm active:scale-95 cursor-pointer border-0 flex items-center justify-center gap-2 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}
+                    style={{ minHeight: isIpad ? '48px' : '40px' }}
+                  >
+                    <Play className="w-4 h-4 fill-white shrink-0" />
+                    <span>{language === 'en' ? 'Start Breathing' : '開始呼吸練習'}</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={stopBreathingLoop}
+                    className={`flex-1 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full font-black tracking-wider transition shadow-sm active:scale-95 cursor-pointer border-0 flex items-center justify-center gap-2 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}
+                    style={{ minHeight: isIpad ? '48px' : '40px' }}
+                  >
+                    <Square className="w-4 h-4 fill-white shrink-0" />
+                    <span>{language === 'en' ? 'Stop' : '停止練習'}</span>
+                  </button>
+                )}
+
+                {/* Voice Toggle Button */}
+                <button
+                  onClick={() => toggleVoice(language === 'en' ? "Box breathing practice. Inhale 4 seconds, hold 4 seconds, exhale 4 seconds, hold 4 seconds. Breathe along with the box." : "呼吸練習。吸氣四秒，閉氣四秒，呼氣四秒，閉氣四秒。跟著方形的縮放，讓我們一起放鬆。")}
+                  className={`p-2 border rounded-xl cursor-pointer active:scale-95 transition flex items-center justify-center shrink-0 ${
+                    isVoiceEnabled 
+                      ? 'bg-brand-sage text-white border-brand-sage hover:bg-brand-moss' 
+                      : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
+                  }`}
+                  style={{ minHeight: isIpad ? '48px' : '40px', minWidth: isIpad ? '48px' : '40px' }}
+                  title={language === 'en' ? "Toggle Voice Guidance" : "語音引導開關"}
+                >
+                  {isVoiceEnabled ? <Volume2 className={isIpad ? "w-5 h-5" : "w-4 h-4"} /> : <VolumeX className={isIpad ? "w-5 h-5" : "w-4 h-4"} />}
+                </button>
+              </div>
+
+              <div className="text-center select-none shrink-0">
+                <p className={`font-medium text-slate-400 ${isIpad ? 'text-xs' : 'text-[11px]'}`}>
+                  {language === 'en' ? 'Adult or teacher guidance recommended' : '建議在家長或教師陪同下進行'}
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTool === 'grounding' && (
+            <motion.div
+              key="grounding"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              className={`flex-1 flex flex-col items-center justify-center space-y-2 my-auto w-full ${isIpad ? 'max-w-2xl sm:space-y-2' : 'max-w-sm sm:space-y-3.5'}`}
+            >
+              {!isGroundingStarted ? (
+                /* Entrance Landing Page */
+                <div className={`w-full flex flex-col items-center justify-center space-y-2 ${isIpad ? 'sm:space-y-3' : 'sm:space-y-3.5'}`}>
+                  <div className="text-center space-y-1">
+                    <div className={`bg-brand-sage/10 text-brand-sage rounded-full flex items-center justify-center mx-auto shadow-inner border border-brand-sage/20 ${isIpad ? 'w-16 h-16' : 'w-14 h-14'}`}>
+                      <Eye className={isIpad ? 'w-8 h-8' : 'w-7 h-7'} />
+                    </div>
+                    <h3 className={`font-black text-gray-800 ${isIpad ? 'text-xl sm:text-2xl mt-2' : 'text-base sm:text-lg'}`}>
+                      {language === 'en' ? '5-4-3-2-1 Grounding' : '5-4-3-2-1 五感著陸'}
+                    </h3>
+                    <p className={`font-bold text-gray-600 leading-relaxed mx-auto ${isIpad ? 'text-sm sm:text-base max-w-sm' : 'text-xs sm:text-sm max-w-xs'}`}>
+                      {language === 'en' ? 'An exercise to bring you back to the present moment 🌸' : '一個協助你回到當下的練習 🌸'}
+                    </p>
+                  </div>
+
+
+                  <div className="space-y-2 w-full text-center">
+                    <div className={`flex gap-2.5 w-full mx-auto items-center justify-center ${isIpad ? 'max-w-[420px]' : 'max-w-[270px] sm:max-w-[360px]'}`}>
+                      <button
+                        onClick={() => {
+                          playClickSound(580, 'sine');
+                          setIsGroundingStarted(true);
+                          setIsGroundingFinished(false);
+                          setGroundingStep(1);
+                          setGroundingChecked({});
+                          safeSpeak(language === 'en' 
+                            ? "Starting grounding exercise. Step 1, Sight: Find 5 things you can see around you."
+                            : "開始五感著陸練習。第一步，視覺：尋找 5 件目光所及的事物。觀看身處空間內的事物即可，例如窗外的樹、桌上的筆、牆上的時鐘。");
+                        }}
+                        className={`flex-1 py-3 bg-brand-sage hover:bg-brand-moss text-white rounded-full font-black tracking-wider transition shadow-sm active:scale-95 cursor-pointer border-0 flex items-center justify-center gap-2 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}
+                        style={{ minHeight: isIpad ? '52px' : '44px' }}
+                      >
+                        <Play className="w-4 h-4 fill-white shrink-0" />
+                        <span>{language === 'en' ? 'Start Grounding' : '開始五感著陸'}</span>
+                      </button>
+
+                      {/* Voice Toggle Button */}
+                      <button
+                        onClick={() => toggleVoice(language === 'en'
+                          ? "5-4-3-2-1 Grounding practice. Observe sight, touch, sound, smell, and taste to help bring you back to the present moment."
+                          : "五感著陸練習。透過觀察身邊的視覺、觸覺、聽覺、嗅覺與味覺，幫助你回歸當下與平靜。")}
+                        className={`p-2.5 border rounded-xl cursor-pointer active:scale-95 transition flex items-center justify-center shrink-0 ${
+                          isVoiceEnabled 
+                            ? 'bg-brand-sage text-white border-brand-sage hover:bg-brand-moss' 
+                            : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
+                        }`}
+                        style={{ minHeight: isIpad ? '52px' : '44px', minWidth: isIpad ? '52px' : '44px' }}
+                        title={language === 'en' ? "Voice Guidance" : "語音引導開關"}
+                      >
+                        {isVoiceEnabled ? <Volume2 className={isIpad ? "w-5 h-5" : "w-4 h-4"} /> : <VolumeX className={isIpad ? "w-5 h-5" : "w-4 h-4"} />}
+                      </button>
+                    </div>
+                    <p className="text-xs font-medium text-center text-slate-400">
+                      {language === 'en' ? 'Adult or teacher guidance recommended' : '建議在家長或教師陪同下進行'}
+                    </p>
+                  </div>
+                </div>
+              ) : isGroundingFinished ? (
+                /* Finished Success Page */
+                <div className={`w-full flex flex-col items-center justify-center space-y-2 ${isIpad ? 'sm:space-y-3' : 'sm:space-y-3.5'}`}>
+                  <div className="text-center space-y-1">
+                    <div className={`bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner border border-emerald-200 ${isIpad ? 'w-16 h-16' : 'w-14 h-14'}`}>
+                      <CheckCircle2 className={isIpad ? 'w-8 h-8' : 'w-7 h-7'} />
+                    </div>
+                    <h3 className={`font-black text-gray-800 ${isIpad ? 'text-xl sm:text-2xl mt-1' : 'text-base sm:text-lg'}`}>
+                      {language === 'en' ? '🎉 Grounding Completed! 🎉' : '🎉 著陸完成！🎉'}
+                    </h3>
+                  </div>
+
+                  <div className={`bg-brand-sand/30 p-2.5 rounded-xl border border-brand-sand text-center w-full ${isIpad ? 'sm:p-3 sm:space-y-2 space-y-2' : 'sm:p-3 space-y-1.5 sm:space-y-2'}`}>
+                    <span className={`font-black text-brand-moss bg-brand-sand/60 rounded-full inline-block ${isIpad ? 'text-sm px-4 py-1.5' : 'text-xs px-2.5 py-0.5'}`}>
+                      {language === 'en' ? '5-4-3-2-1 Grounding' : '5-4-3-2-1 五感著陸'}
+                    </span>
+                    <p className={`font-black text-gray-700 leading-relaxed ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                      {language === 'en' ? (
+                        <>“ You did it!<br />Wonderful job!<br />Come back anytime! ”</>
+                      ) : (
+                        <>「 你做到了！<br />你好棒！<br />下次再來練習喔！」</>
+                      )}
+                    </p>
+                  </div>
+
+                  <div className={`grid grid-cols-2 gap-2.5 w-full ${isIpad ? 'max-w-lg mx-auto mt-2' : ''}`}>
+                    <button
+                      onClick={() => {
+                        playClickSound(580, 'sine');
+                        setIsGroundingStarted(true);
+                        setIsGroundingFinished(false);
+                        setGroundingStep(1);
+                        setGroundingChecked({});
+                        safeSpeak(language === 'en'
+                          ? "Restarting grounding practice. Step 1, Sight: Find 5 things you can see."
+                          : "重新開始著陸練習。第一步，視覺：尋找 5 件目光所及的事物。觀看身處空間內的事物即可，例如窗外的樹、桌上的筆、牆上的時鐘。");
+                      }}
+                      className={`py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 active:scale-95 shadow-xs border-0 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}
+                      style={{ minHeight: isIpad ? '52px' : '42px' }}
+                    >
+                      <RefreshCw className={isIpad ? 'w-5 h-5' : 'w-4 h-4'} />
+                      <span>{language === 'en' ? 'Try Again' : '再試一次'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        playClickSound(400, 'sine');
+                        setIsGroundingStarted(false);
+                        setIsGroundingFinished(false);
+                        setGroundingStep(1);
+                        setGroundingChecked({});
+                      }}
+                      className={`py-2.5 bg-brand-sage hover:bg-brand-moss text-white rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 active:scale-95 shadow-xs border-0 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}
+                      style={{ minHeight: isIpad ? '52px' : '42px' }}
+                    >
+                      <span>{language === 'en' ? 'Back Home' : '回到首頁'}</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Step by Step Flow */
+                <div className={`w-full flex flex-col items-center justify-center space-y-2 ${isIpad ? 'sm:space-y-5' : 'sm:space-y-3'}`}>
+                  {/* Header */}
+                  <div className="text-center">
+                    <span className={`inline-block font-black text-brand-moss bg-brand-sage/10 rounded-full border border-brand-sage/20 ${isIpad ? 'text-sm px-4 py-1.5' : 'text-xs px-3 py-1'}`}>
+                      {language === 'en' ? `Grounding - Step ${groundingStep} / 5` : `五感著陸 - 步驟 ${groundingStep} / 5`}
+                    </span>
+                  </div>
+
+                  {/* Dynamic step visual card */}
+                  <div className={`bg-gradient-to-br from-brand-sand/15 via-white to-brand-sage/10 rounded-xl p-2.5 border-2 border-brand-sand/80 shadow-xs space-y-2 w-full ${isIpad ? 'sm:p-6 sm:space-y-4' : 'sm:p-4 sm:space-y-3'}`}>
+                    <AnimatePresence mode="wait">
+                      {groundingStep === 1 && (
+                        <motion.div
+                          key="g1"
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          className="space-y-2 text-center sm:text-left"
+                        >
+                          <h4 className={`font-black text-slate-800 leading-snug ${isIpad ? 'text-base sm:text-xl' : 'text-sm sm:text-base'}`}>
+                            {language === 'en' ? '👀 Step 1: Sight' : '👀 第一步：視覺'}
+                          </h4>
+                          <p className={`font-black text-emerald-800 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                            {language === 'en' ? 'Find 5 things you can see around you' : '尋找 5 件目光所及的事物'}
+                          </p>
+                          <div className="bg-amber-50/80 p-2 sm:p-2.5 rounded-lg border border-amber-200/80 text-left space-y-1">
+                            <p className={`font-bold text-amber-900 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                              {language === 'en' ? '💡 Look at objects in your surroundings' : '💡 觀看身處空間內的事物即可'}
+                            </p>
+                            <p className={`font-medium text-amber-800 ${isIpad ? 'text-sm' : 'text-xs'}`}>
+                              {language === 'en' ? '(e.g. a tree outside, a pen, a clock)' : '（例如：窗外的樹、桌上的筆、牆上的時鐘）'}
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {groundingStep === 2 && (
+                        <motion.div
+                          key="g2"
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          className="space-y-2 text-center sm:text-left"
+                        >
+                          <h4 className={`font-black text-slate-800 leading-snug ${isIpad ? 'text-base sm:text-xl' : 'text-sm sm:text-base'}`}>
+                            {language === 'en' ? '🖐️ Step 2: Touch' : '🖐️ 第二步：觸覺'}
+                          </h4>
+                          <p className={`font-black text-emerald-800 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                            {language === 'en' ? 'Find 4 things you can touch' : '尋找 4 件可以觸摸的物件'}
+                          </p>
+                          <div className="bg-amber-50/80 p-2 sm:p-2.5 rounded-lg border border-amber-200/80 text-left space-y-1">
+                            <p className={`font-bold text-amber-900 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                              {language === 'en' ? '💡 Touch items near you' : '💡 用手觸摸屬於自己的物品即可'}
+                            </p>
+                            <p className={`font-medium text-amber-800 ${isIpad ? 'text-sm' : 'text-xs'}`}>
+                              {language === 'en' ? '(e.g. your clothes, stationery, a watch)' : '（例如：你的衣服、文具、手錶）'}
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {groundingStep === 3 && (
+                        <motion.div
+                          key="g3"
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          className="space-y-2 text-center sm:text-left"
+                        >
+                          <h4 className={`font-black text-slate-800 leading-snug ${isIpad ? 'text-base sm:text-xl' : 'text-sm sm:text-base'}`}>
+                            {language === 'en' ? '👂 Step 3: Sound' : '👂 第三步：聽覺'}
+                          </h4>
+                          <p className={`font-black text-emerald-800 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                            {language === 'en' ? 'Find 3 sounds you can hear' : '尋找 3 種可以聽見的聲音'}
+                          </p>
+                          <div className="bg-amber-50/80 p-2 sm:p-2.5 rounded-lg border border-amber-200/80 text-left space-y-1">
+                            <p className={`font-bold text-amber-900 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                              {language === 'en' ? '💡 Listen quietly' : '💡 靜心聆聽即可'}
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {groundingStep === 4 && (
+                        <motion.div
+                          key="g4"
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          className="space-y-2 text-center sm:text-left"
+                        >
+                          <h4 className={`font-black text-slate-800 leading-snug ${isIpad ? 'text-base sm:text-xl' : 'text-sm sm:text-base'}`}>
+                            {language === 'en' ? '👃 Step 4: Smell' : '👃 第四步：嗅覺'}
+                          </h4>
+                          <p className={`font-black text-emerald-800 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                            {language === 'en' ? 'Find 2 smells around you' : '尋找 2 種可以聞到的氣味'}
+                          </p>
+                          <div className="bg-amber-50/80 p-2 sm:p-2.5 rounded-lg border border-amber-200/80 text-left space-y-1">
+                            <p className={`font-bold text-amber-900 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                              {language === 'en' ? '💡 Gently notice scents around you' : '💡 輕輕留意身邊的氣味'}
+                            </p>
+                            <p className={`font-medium text-amber-800 ${isIpad ? 'text-sm' : 'text-xs'}`}>
+                              {language === 'en' ? '(e.g. fresh air, pages of a book)' : '（例如：清新的空氣、書本的氣味）'}
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {groundingStep === 5 && (
+                        <motion.div
+                          key="g5"
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          className="space-y-2 text-center sm:text-left"
+                        >
+                          <h4 className={`font-black text-slate-800 leading-snug ${isIpad ? 'text-base sm:text-xl' : 'text-sm sm:text-base'}`}>
+                            {language === 'en' ? '👄 Step 5: Taste' : '👄 第五步：味覺'}
+                          </h4>
+                          <p className={`font-black text-emerald-800 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                            {language === 'en' ? 'Find 1 taste' : '尋找 1 種味道'}
+                          </p>
+                          <div className="bg-amber-50/80 p-2 sm:p-2.5 rounded-lg border border-amber-200/80 text-left space-y-1">
+                            <p className={`font-bold text-amber-900 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                              {language === 'en' ? '💡 Sip water or recall a favorite flavor' : '💡 可飲用自帶清水，或回想喜歡的味道'}
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Primary Action and TTS */}
+                  <div className={`flex gap-2.5 w-full items-center justify-between ${isIpad ? 'max-w-md mx-auto mt-2' : ''}`}>
+                    <button
+                      onClick={() => {
+                        playClickSound(520, 'sine');
+                        if (groundingStep < 5) {
+                          const nextStep = groundingStep + 1;
+                          setGroundingStep(nextStep);
+                          if (nextStep === 2) safeSpeak(language === 'en' ? "Step 2, Touch: Find 4 things you can touch." : "第二步，觸覺：尋找 4 件可以觸摸的物件。用手觸摸屬於自己的物品即可，例如你的衣服、文具、手錶。");
+                          if (nextStep === 3) safeSpeak(language === 'en' ? "Step 3, Sound: Find 3 sounds you can hear." : "第三步，聽覺：尋找 3 種可以聽見的聲音。靜心聆聽即可。");
+                          if (nextStep === 4) safeSpeak(language === 'en' ? "Step 4, Smell: Find 2 smells around you." : "第四步，嗅覺：尋找 2 種可以聞到的氣味。輕輕留意身邊的氣味，例如清新的空氣、書本的氣味。");
+                          if (nextStep === 5) safeSpeak(language === 'en' ? "Step 5, Taste: Find 1 taste." : "第五步，味覺：尋找 1 種味道。可飲用自帶清水，或回想喜歡的味道。");
+                        } else {
+                          setIsGroundingFinished(true);
+                          if (onAwardFirstAidPoint) {
+                            const awarded = onAwardFirstAidPoint();
+                            if (awarded) setPointEarnedNotice(true);
+                          }
+                          safeSpeak(language === 'en' ? "Awesome! You completed the grounding exercise! Great job!" : "太棒了！你完成了五感著陸練習！你做得真棒！");
+                        }
+                      }}
+                      className={`flex-1 py-3 bg-brand-sage hover:bg-brand-moss text-white rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-2 active:scale-95 shadow-xs border-0 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}
+                      style={{ minHeight: isIpad ? '52px' : '42px' }}
+                    >
+                      {groundingStep === 1 && <span>{language === 'en' ? '✅ Found 5 items' : '✅ 我已找到 5 件'}</span>}
+                      {groundingStep === 2 && <span>{language === 'en' ? '✅ Found 4 items' : '✅ 我已找到 4 件'}</span>}
+                      {groundingStep === 3 && <span>{language === 'en' ? '✅ Found 3 sounds' : '✅ 我已找到 3 種'}</span>}
+                      {groundingStep === 4 && <span>{language === 'en' ? '✅ Found 2 smells' : '✅ 我已找到 2 種'}</span>}
+                      {groundingStep === 5 && <span>{language === 'en' ? '✅ Found 1 taste' : '✅ 我已找到 1 種'}</span>}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        let text = "";
+                        if (groundingStep === 1) text = language === 'en' ? "Step 1, Sight: Find 5 things you can see around you." : "👀 第一步，視覺：尋找 5 件目光所及的事物。觀看身處空間內的事物即可，例如窗外的樹、桌上的筆、牆上的時鐘。";
+                        if (groundingStep === 2) text = language === 'en' ? "Step 2, Touch: Find 4 things you can touch." : "🖐️ 第二步，觸覺：尋找 4 件可以觸摸的物件。用手觸摸屬於自己的物品即可，例如你的衣服、文具、手錶。";
+                        if (groundingStep === 3) text = language === 'en' ? "Step 3, Sound: Find 3 sounds you can hear." : "👂 第三步，聽覺：尋找 3 種可以聽見的聲音。靜心聆聽即可。";
+                        if (groundingStep === 4) text = language === 'en' ? "Step 4, Smell: Find 2 smells around you." : "👃 第四步，嗅覺：尋找 2 種可以聞到的氣味。輕輕留意身邊的氣味，例如清新的空氣、書本的氣味。";
+                        if (groundingStep === 5) text = language === 'en' ? "Step 5, Taste: Find 1 taste." : "👄 第五步，味覺：尋找 1 種味道。可飲用自帶清水，或回想喜歡的味道。";
+                        toggleVoice(text);
+                      }}
+                      className={`p-2.5 border rounded-xl cursor-pointer active:scale-95 transition flex items-center justify-center ${
+                        isVoiceEnabled 
+                          ? 'bg-brand-sage text-white border-brand-sage hover:bg-brand-moss' 
+                          : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
+                      }`}
+                      style={{ minHeight: isIpad ? '52px' : '42px', minWidth: isIpad ? '52px' : '42px' }}
+                      title={language === 'en' ? "Voice Guidance" : "語音引導開關"}
+                    >
+                      {isVoiceEnabled ? <Volume2 className={isIpad ? "w-5 h-5" : "w-4 h-4"} /> : <VolumeX className={isIpad ? "w-5 h-5" : "w-4 h-4"} />}
+                    </button>
+                  </div>
+
+                  <div className="text-center">
+                    <p className="text-xs font-black text-brand-moss select-none animate-pulse">
+                      {language === 'en' ? '💡 Once done, tap the button to go to the next step!' : '💡 完成本步驟後，點擊按鈕進入下一步！'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {activeTool === 'haven' && (
+            <motion.div
+              key="haven"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              className={`flex-1 flex flex-col items-center justify-center space-y-2 my-auto w-full ${isIpad ? 'max-w-2xl sm:space-y-4' : 'max-w-sm sm:space-y-3.5'}`}
+            >
+              {!isGuiding ? (
+                /* Landing Entrance Screen */
+                <div className={`w-full flex flex-col items-center justify-center space-y-2 ${isIpad ? 'sm:space-y-4' : 'sm:space-y-3.5'}`}>
+                  <div className="text-center space-y-1">
+                    <div className={`bg-brand-sage/10 text-brand-sage rounded-full flex items-center justify-center mx-auto shadow-inner border border-brand-sage/20 ${isIpad ? 'w-16 h-16' : 'w-14 h-14'}`}>
+                      <HelpCircle className={isIpad ? 'w-8 h-8' : 'w-7 h-7'} />
+                    </div>
+                    <h3 className={`font-black text-slate-800 ${isIpad ? 'text-xl sm:text-2xl mt-2' : 'text-base sm:text-lg'}`}>
+                      {language === 'en' ? 'Mindful Haven' : '心晴空間'}
+                    </h3>
+                    <p className={`font-semibold text-slate-500 leading-relaxed ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                      {language === 'en' ? 'A cozy space to soothe your mind and warm your heart.' : '陪伴你放鬆心情、加油打氣的溫暖空間。'}
+                    </p>
+                  </div>
+
+                  <div className="w-full space-y-2 text-center">
+                    <div className={`flex gap-2.5 w-full mx-auto items-center justify-center ${isIpad ? 'max-w-[420px]' : 'max-w-[270px] sm:max-w-[360px]'}`}>
+                      <button
+                        onClick={() => {
+                          playClickSound(580, 'sine');
+                          const randIdx = Math.floor(Math.random() * passages.length);
+                          setCurrentPassageIdx(randIdx);
+                          setIsGuiding(true);
+                          const p = passages[randIdx];
+                          safeSpeak(p.guide + " " + p.quote);
+                        }}
+                        className={`flex-1 py-3 bg-brand-sage hover:bg-brand-moss text-white rounded-full font-black tracking-wider transition shadow-sm active:scale-95 cursor-pointer border-0 flex items-center justify-center gap-2 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}
+                        style={{ minHeight: isIpad ? '52px' : '44px' }}
+                      >
+                        <Play className="w-4 h-4 fill-white shrink-0" />
+                        <span>{language === 'en' ? 'Start Haven Guidance' : '開始心晴引導'}</span>
+                      </button>
+
+                      {/* Voice Toggle Button */}
+                      <button
+                        onClick={() => toggleVoice(language === 'en' ? "Mindful Haven. A cozy space to soothe your mind." : "心晴空間。陪伴你放鬆心情、加油打氣的溫暖空間。")}
+                        className={`p-2.5 border rounded-xl cursor-pointer active:scale-95 transition flex items-center justify-center shrink-0 ${
+                          isVoiceEnabled 
+                            ? 'bg-brand-sage text-white border-brand-sage hover:bg-brand-moss' 
+                            : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
+                        }`}
+                        style={{ minHeight: isIpad ? '52px' : '44px', minWidth: isIpad ? '52px' : '44px' }}
+                        title={language === 'en' ? "Voice Guidance" : "語音引導開關"}
+                      >
+                        {isVoiceEnabled ? <Volume2 className={isIpad ? "w-5 h-5" : "w-4 h-4"} /> : <VolumeX className={isIpad ? "w-5 h-5" : "w-4 h-4"} />}
+                      </button>
+                    </div>
+                    
+                    <p className="text-xs font-medium text-slate-400">
+                      {language === 'en' ? 'Adult or teacher guidance recommended' : '建議在家長或教師陪同下進行'}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                /* Interactive Guidance Screen */
+                <div className={`flex-1 flex flex-col justify-between py-1 w-full ${isIpad ? 'max-w-3xl mx-auto space-y-2' : 'space-y-2 sm:space-y-3 max-w-sm mx-auto'}`}>
+                  {/* Header Indicator */}
+                  <div className="text-center space-y-1">
+                    <h3 className={`font-black text-emerald-800 tracking-tight ${isIpad ? 'text-base sm:text-lg' : 'text-base'}`}>
+                      【 {passages[currentPassageIdx]?.title || ''} 】
+                    </h3>
+                  </div>
+
+                  {/* Healing Page Box */}
+                  <div className={`bg-gradient-to-br from-brand-sand/15 via-white to-brand-sage/10 rounded-2xl border-2 border-brand-sand/80 shadow-xs text-center mx-auto w-full ${isIpad ? 'p-4 space-y-2' : 'p-2.5 sm:p-3 space-y-1.5 sm:space-y-3.5'}`}>
+                    {/* Text Guide */}
+                    <div className="space-y-1 text-left">
+                      <span className={`uppercase font-black tracking-wider text-brand-sage block select-none ${isIpad ? 'text-sm' : 'text-xs'}`}>
+                        {language === 'en' ? '🧭 Breath & Visualization' : '🧭 呼吸與想像導引'}
+                      </span>
+                      <p className={`font-bold text-slate-700 leading-relaxed font-sans ${isIpad ? 'text-base sm:text-lg' : 'text-xs sm:text-sm'}`}>
+                        {passages[currentPassageIdx]?.guide || ''}
+                      </p>
+                    </div>
+
+                    {/* Divider Line */}
+                    <div className="border-t border-dashed border-brand-sand my-0.5" />
+
+                    {/* Warm Quote */}
+                    <div className={`text-left bg-white/70 rounded-xl border border-brand-sand/40 ${isIpad ? 'p-3 space-y-1' : 'p-2 sm:p-2.5 space-y-1'}`}>
+                      <span className={`uppercase font-black tracking-wider text-amber-700 block select-none ${isIpad ? 'text-sm' : 'text-xs'}`}>
+                        {language === 'en' ? '💖 Words of Comfort' : '💖 心晴加油小語'}
+                      </span>
+                      <p className={`font-black text-emerald-800 leading-relaxed italic font-sans ${isIpad ? 'text-base sm:text-lg' : 'text-xs sm:text-sm'}`}>
+                        {passages[currentPassageIdx]?.quote || ''}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Sub-Actions Bar (換一段、語音、結束) */}
+                  <div className={`grid grid-cols-3 gap-2 w-full ${isIpad ? 'max-w-2xl mx-auto mt-2' : 'max-w-xs mx-auto'}`}>
+                    {/* 1. 換一段 (Next Segment) */}
+                    <button
+                      onClick={() => {
+                        playClickSound(520, 'sine');
+                        let nextIdx = currentPassageIdx;
+                        if (passages.length > 1) {
+                          while (nextIdx === currentPassageIdx) {
+                            nextIdx = Math.floor(Math.random() * passages.length);
+                          }
+                        }
+                        setCurrentPassageIdx(nextIdx);
+                        const p = passages[nextIdx];
+                        safeSpeak(p.guide + " " + p.quote);
+                      }}
+                      className={`py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 active:scale-95 shadow-xs border-0 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-[13px]'}`}
+                      style={{ minHeight: isIpad ? '52px' : '40px' }}
+                      title={language === 'en' ? "Switch to another passage" : "隨記切換下一篇溫暖引導"}
+                    >
+                      <RefreshCw className={isIpad ? 'w-4 h-4' : 'w-3.5 h-3.5'} />
+                      <span>{language === 'en' ? 'Shuffle' : '換一段'}</span>
+                    </button>
+
+                    {/* 2. 語音 (TTS Play) */}
+                    <button
+                      onClick={() => {
+                        const p = passages[currentPassageIdx];
+                        if (p) toggleVoice(p.guide + " " + p.quote);
+                      }}
+                      className={`py-2.5 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 active:scale-95 shadow-xs border ${
+                        isVoiceEnabled
+                          ? 'bg-brand-sage text-white border-brand-sage hover:bg-brand-moss'
+                          : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
+                      } ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-[13px]'}`}
+                      style={{ minHeight: isIpad ? '52px' : '40px' }}
+                      title={language === 'en' ? "Voice Guidance" : "語音引導開關"}
+                    >
+                      {isVoiceEnabled ? <Volume2 className={isIpad ? 'w-4 h-4' : 'w-3.5 h-3.5'} /> : <VolumeX className={isIpad ? 'w-4 h-4' : 'w-3.5 h-3.5'} />}
+                      <span>{language === 'en' ? 'Voice' : '語音'}</span>
+                    </button>
+
+                    {/* 3. 結束 (Exit / Back to start) */}
+                    <button
+                      onClick={() => {
+                        playClickSound(400, 'sine');
+                        if ('speechSynthesis' in window) {
+                          window.speechSynthesis.cancel();
+                        }
+                        setIsGuiding(false);
+                      }}
+                      className={`py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 active:scale-95 shadow-2xs border border-gray-200 ${isIpad ? 'text-sm sm:text-base' : 'text-xs sm:text-[13px]'}`}
+                      style={{ minHeight: isIpad ? '52px' : '40px' }}
+                    >
+                      <span>{language === 'en' ? 'Finish' : '結束'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}

@@ -66,13 +66,13 @@ export default function CatAdoptionOrb({ onAdoptComplete, isIpad = false }: CatA
       {/* Dialogue / Subtitle Overlay above the Orb */}
       <AnimatePresence mode="wait">
         {stage === 1 && (
-          <div className="flex flex-col items-center z-50 relative gap-0.5 -mb-0.5">
+          <div className="flex flex-col items-center z-50 relative gap-1 mb-0.5">
             <motion.div
               key="stage1-bubble"
               initial={{ opacity: 0, y: 8, scale: 0.85 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.85 }}
-              className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-xs border-2 border-amber-300/80 relative max-w-[190px] text-center"
+              className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-xs border-2 border-amber-300/80 relative max-w-[190px] text-center mb-1"
             >
               <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-b-2 border-r-2 border-amber-300/80 rotate-45"></div>
               <div className="flex flex-col items-center">
@@ -88,9 +88,9 @@ export default function CatAdoptionOrb({ onAdoptComplete, isIpad = false }: CatA
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.85 }}
               onClick={handleClaim}
-              className="px-2.5 py-0.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-500 hover:to-amber-500 text-white rounded-full text-[11px] font-black shadow-[0_2px_10px_rgba(250,204,21,0.5)] flex items-center gap-1 active:scale-95 transition cursor-pointer border-0 animate-bounce whitespace-nowrap"
+              className="mt-1 translate-y-1 px-3 py-1 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-500 hover:to-amber-500 text-white rounded-full text-xs font-black shadow-[0_2px_10px_rgba(250,204,21,0.5)] flex items-center gap-1 active:scale-95 transition cursor-pointer border-0 animate-bounce whitespace-nowrap z-50"
             >
-              <Sparkles className="w-3 h-3 fill-yellow-100 text-yellow-100" />
+              <Sparkles className="w-3.5 h-3.5 fill-yellow-100 text-yellow-100" />
               <span>{language === 'en' ? 'Claim' : '領取'}</span>
             </motion.button>
           </div>

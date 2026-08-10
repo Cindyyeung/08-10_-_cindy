@@ -57,6 +57,7 @@ export default function GachaView({
   const [prizeToApply, setPrizeToApply] = useState<GachaPrize | null>(null);
   const [adminStep, setAdminStep] = useState<0 | 1 | 2>(0);
   const [selectedAdminPrize, setSelectedAdminPrize] = useState<GachaPrize | null>(null);
+  const [isGardenMgmtOpen, setIsGardenMgmtOpen] = useState(false);
 
   const handleDraw = (method: 'score' | 'card') => {
     if (isGachaRunning) return;
@@ -155,11 +156,11 @@ export default function GachaView({
           </div>
 
           <div className="text-center mb-3 sm:mb-6">
-            <p className="text-slate-600 font-bold mb-1.5 text-xs sm:text-sm">💡 每次扭蛋：消耗 5 積分 或 1 張圖鑑</p>
-            <div className="flex gap-2.5 sm:gap-4 justify-center items-center text-xs sm:text-sm font-black text-slate-700 bg-slate-100 py-1.5 px-3 sm:py-2 sm:px-4 rounded-lg sm:rounded-xl">
+            <p className="text-slate-600 font-bold mb-1.5 text-xs sm:text-sm whitespace-nowrap">💡 每次扭蛋：消耗 5 積分 或 1 張圖鑑</p>
+            <div className="flex flex-row flex-nowrap gap-1.5 sm:gap-3 justify-center items-center text-[11px] sm:text-sm font-black text-slate-700 bg-slate-100 py-1.5 px-2.5 sm:py-2 sm:px-4 rounded-lg sm:rounded-xl whitespace-nowrap">
               <span>你目前有：</span>
               <span className="text-amber-600">⭐ {score} 分</span>
-              <span className="text-sky-600">🃏 {unlockedCardsCount} 張</span>
+              <span className="text-sky-600 font-black">🃏 {unlockedCardsCount} 張</span>
             </div>
           </div>
 
@@ -170,19 +171,19 @@ export default function GachaView({
               setShowConfirm(true);
             }}
             disabled={isGachaRunning || (score < 5 && unlockedCardsCount < 1)}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-sm sm:text-lg shadow-md hover:shadow-xl active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-amber-600/85 to-orange-500/85 hover:from-amber-600 hover:to-orange-500 text-white py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-sm sm:text-lg shadow-md hover:shadow-xl active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             [ 扭一扭！]
           </button>
         </div>
 
         {/* Collection Section */}
-        <div className="w-full mt-6 sm:mt-10">
-          <h3 className="text-center text-sm sm:text-lg font-black text-slate-700 mb-3 sm:mb-6 tracking-widest">
+        <div className="w-full mt-4 sm:mt-10">
+          <h3 className="text-center text-xs sm:text-lg font-black text-slate-700 mb-2.5 sm:mb-6 tracking-wider whitespace-nowrap">
             ─── 📦 獎品圖鑑 ───
           </h3>
           
-          <div className="grid grid-cols-4 sm:grid-cols-4 gap-2 sm:gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
             {GACHA_PRIZES.map(prize => {
               const isUnlocked = unlockedPrizes.includes(prize.id);
               const ownedCount = unlockedPrizes.filter(id => id === prize.id).length;
@@ -195,24 +196,32 @@ export default function GachaView({
                       setPrizeToApply(prize);
                     }
                   }}
-                  className={`relative flex flex-col items-center justify-center p-2 sm:p-3 rounded-xl sm:rounded-2xl border-2 ${
-                    isUnlocked ? 'bg-white border-purple-200 shadow-xs cursor-pointer hover:bg-purple-50 active:scale-95 transition-all' : 'bg-slate-100 border-slate-200 grayscale opacity-70'
+                  className={`relative flex flex-col items-center justify-between p-2 sm:p-3 rounded-xl sm:rounded-2xl border min-h-[82px] sm:min-h-[110px] ${
+                    isUnlocked ? 'bg-white border-purple-200 shadow-2xs cursor-pointer hover:bg-purple-50 active:scale-95 transition-all' : 'bg-slate-100/90 border-slate-200 opacity-75'
                   }`}
                 >
                   {isUnlocked && ownedCount > 1 && (
-                    <div className="absolute -top-1.5 -right-1.5 bg-purple-500 text-white text-[9px] sm:text-[10px] font-black w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center shadow-xs">
+                    <div className="absolute -top-1.5 -right-1.5 bg-purple-500 text-white text-[9px] sm:text-[10px] font-black w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center shadow-xs z-10">
                       x{ownedCount}
                     </div>
                   )}
-                  <span className="text-xl sm:text-3xl mb-1 sm:mb-2">{isUnlocked ? prize.emoji : '🎁'}</span>
-                  <span className="text-[10px] sm:text-xs font-bold text-center text-slate-600 leading-tight">
+                  <span className={`text-2xl sm:text-3xl my-0.5 ${!isUnlocked ? 'grayscale opacity-60' : ''}`}>
+                    {isUnlocked ? prize.emoji : '🎁'}
+                  </span>
+                  <span className="text-[11px] sm:text-xs font-black text-center text-slate-700 leading-tight whitespace-nowrap">
                     {isUnlocked ? prize.name : '?'}
                   </span>
-                  {!isUnlocked && (
-                    <div className="mt-0.5 flex items-center text-[9px] sm:text-[10px] text-slate-400 font-bold">
-                      <span>🔒 未解鎖</span>
-                    </div>
-                  )}
+                  <div className="mt-1 flex items-center justify-center">
+                    {!isUnlocked ? (
+                      <span className="text-[9px] sm:text-[10px] text-slate-400 font-bold whitespace-nowrap bg-slate-200/70 px-1.5 py-0.5 rounded-full">
+                        🔒 未解鎖
+                      </span>
+                    ) : (
+                      <span className="text-[9px] sm:text-[10px] text-purple-600 font-bold whitespace-nowrap bg-purple-50 px-1.5 py-0.5 rounded-full">
+                        ✨ 已解鎖
+                      </span>
+                    )}
+                  </div>
                 </div>
               );
             })}
@@ -221,119 +230,127 @@ export default function GachaView({
 
         {/* Garden Management Section */}
         {GACHA_PRIZES.some(p => unlockedPrizes.includes(p.id) || (p.id === 1 && (plantState.companions?.beeOwned || plantState.companions?.bee || 0) > 0) || (p.id === 2 && (plantState.companions?.butterflyOwned || plantState.companions?.butterfly || 0) > 0) || (p.id === 3 && plantState.potTheme === 'rainbow') || (p.id === 4 && plantState.potTheme === 'star') || (p.id === 5 && plantState.potTheme === 'cloud') || (p.type === 'decoration' && (plantState.activeDecorations?.includes(p.id) || false))) && (
-          <div className="w-full mt-6 sm:mt-10 mb-6 sm:mb-8">
-            <h3 className="text-center text-sm sm:text-lg font-black text-slate-700 mb-3 sm:mb-6 tracking-widest">
-              ─── 🛠️ 花園管理 ───
-            </h3>
+          <div className="w-full mt-4 sm:mt-10 mb-4 sm:mb-8">
+            <button
+              onClick={() => {
+                playClickSound(400, 'sine');
+                setIsGardenMgmtOpen(!isGardenMgmtOpen);
+              }}
+              className="w-full flex items-center justify-center gap-1.5 text-center text-xs sm:text-lg font-black text-slate-700 py-1.5 hover:text-purple-600 transition tracking-wider cursor-pointer whitespace-nowrap"
+            >
+              <span>─── 🛠️ 花園管理 {isGardenMgmtOpen ? '▲' : '▼'} ───</span>
+            </button>
             
-            <div className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 shadow-xs border border-slate-200">
-              <p className="text-xs sm:text-sm font-bold text-slate-500 mb-3 sm:mb-4 text-center">在此開啟或關閉已解鎖的裝飾與小夥伴</p>
-              
-              <div className="flex flex-col gap-2 sm:gap-3">
-                {GACHA_PRIZES.filter(p => unlockedPrizes.includes(p.id) || (p.id === 1 && (plantState.companions?.beeOwned || plantState.companions?.bee || 0) > 0) || (p.id === 2 && (plantState.companions?.butterflyOwned || plantState.companions?.butterfly || 0) > 0) || (p.id === 3 && plantState.potTheme === 'rainbow') || (p.id === 4 && plantState.potTheme === 'star') || (p.id === 5 && plantState.potTheme === 'cloud') || (p.type === 'decoration' && (plantState.activeDecorations?.includes(p.id) || false))).map(prize => {
-                  let isActive = false;
-                  let displayCount = 0;
-                  let maxCount = 1;
+            {isGardenMgmtOpen && (
+              <div className="mt-2.5 bg-white rounded-xl sm:rounded-3xl p-2.5 sm:p-6 shadow-2xs border border-slate-200">
+                <p className="text-[10px] sm:text-sm font-bold text-slate-500 mb-2 sm:mb-4 text-center whitespace-nowrap">在此開啟或關閉已解鎖的裝飾與小夥伴</p>
+                
+                <div className="flex flex-col gap-1.5 sm:gap-3">
+                  {GACHA_PRIZES.filter(p => unlockedPrizes.includes(p.id) || (p.id === 1 && (plantState.companions?.beeOwned || plantState.companions?.bee || 0) > 0) || (p.id === 2 && (plantState.companions?.butterflyOwned || plantState.companions?.butterfly || 0) > 0) || (p.id === 3 && plantState.potTheme === 'rainbow') || (p.id === 4 && plantState.potTheme === 'star') || (p.id === 5 && plantState.potTheme === 'cloud') || (p.type === 'decoration' && (plantState.activeDecorations?.includes(p.id) || false))).map(prize => {
+                    let isActive = false;
+                    let displayCount = 0;
+                    let maxCount = 1;
 
-                  if (prize.type === 'companion') {
-                    if (prize.id === 1) {
-                      displayCount = plantState.companions?.beeDisplay ?? plantState.companions?.bee ?? 0;
-                      maxCount = Math.max(unlockedPrizes.filter(id => id === 1).length, plantState.companions?.beeOwned ?? plantState.companions?.bee ?? 0);
+                    if (prize.type === 'companion') {
+                      if (prize.id === 1) {
+                        displayCount = plantState.companions?.beeDisplay ?? plantState.companions?.bee ?? 0;
+                        maxCount = Math.max(unlockedPrizes.filter(id => id === 1).length, plantState.companions?.beeOwned ?? plantState.companions?.bee ?? 0);
+                      }
+                      if (prize.id === 2) {
+                        displayCount = plantState.companions?.butterflyDisplay ?? plantState.companions?.butterfly ?? 0;
+                        maxCount = Math.max(unlockedPrizes.filter(id => id === 2).length, plantState.companions?.butterflyOwned ?? plantState.companions?.butterfly ?? 0);
+                      }
+                      isActive = displayCount > 0;
+                    } else if (prize.type === 'pot') {
+                      if (prize.id === 3) isActive = plantState.potTheme === 'rainbow';
+                      if (prize.id === 4) isActive = plantState.potTheme === 'star';
+                      if (prize.id === 5) isActive = plantState.potTheme === 'cloud';
+                    } else if (prize.type === 'decoration') {
+                      isActive = plantState.activeDecorations?.includes(prize.id) || false;
                     }
-                    if (prize.id === 2) {
-                      displayCount = plantState.companions?.butterflyDisplay ?? plantState.companions?.butterfly ?? 0;
-                      maxCount = Math.max(unlockedPrizes.filter(id => id === 2).length, plantState.companions?.butterflyOwned ?? plantState.companions?.butterfly ?? 0);
-                    }
-                    isActive = displayCount > 0;
-                  } else if (prize.type === 'pot') {
-                    if (prize.id === 3) isActive = plantState.potTheme === 'rainbow';
-                    if (prize.id === 4) isActive = plantState.potTheme === 'star';
-                    if (prize.id === 5) isActive = plantState.potTheme === 'cloud';
-                  } else if (prize.type === 'decoration') {
-                    isActive = plantState.activeDecorations?.includes(prize.id) || false;
-                  }
 
-                  return (
-                    <div key={prize.id} className="flex items-center justify-between p-2 sm:p-3 bg-slate-50 rounded-lg sm:rounded-xl">
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <span className="text-lg sm:text-2xl">{prize.emoji}</span>
-                        <span className="font-black text-xs sm:text-base text-slate-700">{prize.name}</span>
-                      </div>
-                      
-                      {prize.type === 'companion' ? (
-                        <div className="flex items-center gap-1.5 sm:gap-2">
-                          <button
-                            onClick={() => {
-                              if (displayCount > 0) {
-                                playClickSound(400, 'sine');
-                                const updatedPlant = { ...plantState };
-                                if (!updatedPlant.companions) updatedPlant.companions = {};
-                                if (prize.id === 1) updatedPlant.companions.beeDisplay = displayCount - 1;
-                                if (prize.id === 2) updatedPlant.companions.butterflyDisplay = displayCount - 1;
-                                onUpdatePlantState(updatedPlant);
-                              }
-                            }}
-                            disabled={displayCount === 0}
-                            className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-200 flex items-center justify-center font-black text-xs sm:text-base text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-300 transition"
-                          >
-                            -
-                          </button>
-                          <span className="w-3 sm:w-4 text-center font-bold text-xs sm:text-sm text-slate-700">{displayCount}</span>
-                          <button
-                            onClick={() => {
-                              if (displayCount < maxCount) {
-                                playClickSound(400, 'sine');
-                                const updatedPlant = { ...plantState };
-                                if (!updatedPlant.companions) updatedPlant.companions = {};
-                                if (prize.id === 1) updatedPlant.companions.beeDisplay = displayCount + 1;
-                                if (prize.id === 2) updatedPlant.companions.butterflyDisplay = displayCount + 1;
-                                onUpdatePlantState(updatedPlant);
-                              }
-                            }}
-                            disabled={displayCount >= maxCount}
-                            className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-purple-100 flex items-center justify-center font-black text-xs sm:text-base text-purple-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-200 transition"
-                          >
-                            +
-                          </button>
+                    return (
+                      <div key={prize.id} className="flex items-center justify-between p-1.5 sm:p-3 bg-slate-50 rounded-lg sm:rounded-xl">
+                        <div className="flex items-center gap-1.5 sm:gap-3">
+                          <span className="text-base sm:text-2xl">{prize.emoji}</span>
+                          <span className="font-black text-[11px] sm:text-base text-slate-700 whitespace-nowrap">{prize.name}</span>
                         </div>
-                      ) : (
-                        <button
-                          onClick={() => {
-                            playClickSound(400, 'sine');
-                            const updatedPlant = { ...plantState };
-                            
-                            if (prize.type === 'pot') {
-                              if (isActive) {
-                                updatedPlant.potTheme = 'default';
-                              } else {
-                                if (prize.id === 3) updatedPlant.potTheme = 'rainbow';
-                                if (prize.id === 4) updatedPlant.potTheme = 'star';
-                                if (prize.id === 5) updatedPlant.potTheme = 'cloud';
+                        
+                        {prize.type === 'companion' ? (
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <button
+                              onClick={() => {
+                                if (displayCount > 0) {
+                                  playClickSound(400, 'sine');
+                                  const updatedPlant = { ...plantState };
+                                  if (!updatedPlant.companions) updatedPlant.companions = {};
+                                  if (prize.id === 1) updatedPlant.companions.beeDisplay = displayCount - 1;
+                                  if (prize.id === 2) updatedPlant.companions.butterflyDisplay = displayCount - 1;
+                                  onUpdatePlantState(updatedPlant);
+                                }
+                              }}
+                              disabled={displayCount === 0}
+                              className="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-slate-200 flex items-center justify-center font-black text-[10px] sm:text-base text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-300 transition"
+                            >
+                              -
+                            </button>
+                            <span className="w-3 sm:w-4 text-center font-bold text-[11px] sm:text-sm text-slate-700 whitespace-nowrap">{displayCount}</span>
+                            <button
+                              onClick={() => {
+                                if (displayCount < maxCount) {
+                                  playClickSound(400, 'sine');
+                                  const updatedPlant = { ...plantState };
+                                  if (!updatedPlant.companions) updatedPlant.companions = {};
+                                  if (prize.id === 1) updatedPlant.companions.beeDisplay = displayCount + 1;
+                                  if (prize.id === 2) updatedPlant.companions.butterflyDisplay = displayCount + 1;
+                                  onUpdatePlantState(updatedPlant);
+                                }
+                              }}
+                              disabled={displayCount >= maxCount}
+                              className="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-purple-100 flex items-center justify-center font-black text-[10px] sm:text-base text-purple-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-200 transition"
+                            >
+                              +
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              playClickSound(400, 'sine');
+                              const updatedPlant = { ...plantState };
+                              
+                              if (prize.type === 'pot') {
+                                if (isActive) {
+                                  updatedPlant.potTheme = 'default';
+                                } else {
+                                  if (prize.id === 3) updatedPlant.potTheme = 'rainbow';
+                                  if (prize.id === 4) updatedPlant.potTheme = 'star';
+                                  if (prize.id === 5) updatedPlant.potTheme = 'cloud';
+                                }
+                              } else if (prize.type === 'decoration') {
+                                if (!updatedPlant.activeDecorations) updatedPlant.activeDecorations = [];
+                                if (isActive) {
+                                  updatedPlant.activeDecorations = updatedPlant.activeDecorations.filter(id => id !== prize.id);
+                                } else {
+                                  updatedPlant.activeDecorations.push(prize.id);
+                                }
                               }
-                            } else if (prize.type === 'decoration') {
-                              if (!updatedPlant.activeDecorations) updatedPlant.activeDecorations = [];
-                              if (isActive) {
-                                updatedPlant.activeDecorations = updatedPlant.activeDecorations.filter(id => id !== prize.id);
-                              } else {
-                                updatedPlant.activeDecorations.push(prize.id);
-                              }
-                            }
-                            onUpdatePlantState(updatedPlant);
-                          }}
-                          className={`px-2.5 py-1 sm:px-4 sm:py-2 rounded-md sm:rounded-lg font-black text-xs sm:text-sm transition ${
-                            isActive 
-                              ? 'bg-red-100 text-red-700 hover:bg-red-200' 
-                              : 'bg-green-100 text-green-700 hover:bg-green-200'
-                          }`}
-                        >
-                          {isActive ? '隱藏' : '顯示'}
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
+                              onUpdatePlantState(updatedPlant);
+                            }}
+                            className={`px-2 py-0.5 sm:px-4 sm:py-2 rounded-md sm:rounded-lg font-black text-[10px] sm:text-sm whitespace-nowrap transition ${
+                              isActive 
+                                ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+                                : 'bg-green-100 text-green-700 hover:bg-green-200'
+                            }`}
+                          >
+                            {isActive ? '隱藏' : '顯示'}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>

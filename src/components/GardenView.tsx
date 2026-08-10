@@ -1293,36 +1293,36 @@ export default function GardenView({
           </div>
 
           {/* Subtitle prompt */}
-          <div className="bg-amber-50/80 p-3 rounded-xl border border-amber-200 text-center space-y-1">
-            <p className="text-xs font-black text-amber-900">
+          <div className="bg-amber-50/80 p-2 sm:p-3 rounded-xl border border-amber-200 text-center space-y-1">
+            <p className="text-[10px] sm:text-xs font-black text-amber-900 whitespace-nowrap">
               設定與擺放你的花盆款式、園藝裝飾與花園小夥伴 🌸
             </p>
           </div>
 
           {/* Section 1: 🐾 花園小夥伴 */}
-          <div className="space-y-2.5">
-            <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider px-1">
+          <div className="space-y-2">
+            <h3 className="text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider px-1">
               🐾 花園小夥伴
             </h3>
             
             {/* 🐝 Bee */}
-            <div className="bg-white p-3.5 rounded-2xl border border-brand-sand shadow-xs flex items-center justify-between gap-3">
+            <div className="bg-white p-2 sm:p-3.5 rounded-xl sm:rounded-2xl border border-brand-sand shadow-2xs flex items-center justify-between gap-2 sm:gap-3">
               <div className="space-y-0.5 text-left flex-1">
-                <h4 className="text-sm font-black text-gray-800 flex items-center gap-1.5">
-                  <span className="text-lg">🐝</span>
-                  <span>小蜜蜂</span>
+                <h4 className="text-xs sm:text-sm font-black text-gray-800 flex items-center gap-1 sm:gap-1.5">
+                  <span className="text-base sm:text-lg">🐝</span>
+                  <span className="whitespace-nowrap">小蜜蜂</span>
                 </h4>
-                <p className="text-[11px] font-bold text-gray-500">
+                <p className="text-[10px] sm:text-[11px] font-bold text-gray-500 whitespace-nowrap">
                   已擁有 <span className="font-mono text-amber-700 font-black">{beeOwned}</span> 隻（上限 5 隻）
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 bg-amber-50/60 p-1.5 rounded-full border border-amber-200/80">
+              <div className="flex items-center gap-1 sm:gap-2 bg-amber-50/60 p-1 sm:p-1.5 rounded-full border border-amber-200/80">
                 <button
                   type="button"
                   disabled={beeDisplay <= 0}
                   onClick={() => handleUpdateCompanionDisplay('bee', -1)}
-                  className={`w-7 h-7 rounded-full font-black text-sm flex items-center justify-center transition border ${
+                  className={`w-5 h-5 sm:w-7 sm:h-7 rounded-full font-black text-xs sm:text-sm flex items-center justify-center transition border ${
                     beeDisplay > 0
                       ? 'bg-white text-amber-900 border-amber-300 hover:bg-amber-100 active:scale-90 cursor-pointer'
                       : 'bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed'
@@ -1330,16 +1330,16 @@ export default function GardenView({
                 >
                   −
                 </button>
-                <span className="w-5 text-center font-mono font-black text-xs text-gray-800">
+                <span className="w-4 text-center font-mono font-black text-[11px] sm:text-xs text-gray-800">
                   {beeDisplay}
                 </span>
                 <button
                   type="button"
                   disabled={beeDisplay >= beeOwned || beeDisplay >= 5}
                   onClick={() => handleUpdateCompanionDisplay('bee', 1)}
-                  className={`w-7 h-7 rounded-full font-black text-sm flex items-center justify-center transition border ${
+                  className={`w-5 h-5 sm:w-7 sm:h-7 rounded-full font-black text-xs sm:text-sm flex items-center justify-center transition border ${
                     beeDisplay < beeOwned && beeDisplay < 5
-                      ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600 active:scale-90 cursor-pointer shadow-xs'
+                      ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600 active:scale-90 cursor-pointer shadow-2xs'
                       : 'bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed'
                   }`}
                 >
@@ -1349,23 +1349,23 @@ export default function GardenView({
             </div>
 
             {/* 🦋 Butterfly */}
-            <div className="bg-white p-3.5 rounded-2xl border border-brand-sand shadow-xs flex items-center justify-between gap-3">
+            <div className="bg-white p-2 sm:p-3.5 rounded-xl sm:rounded-2xl border border-brand-sand shadow-2xs flex items-center justify-between gap-2 sm:gap-3">
               <div className="space-y-0.5 text-left flex-1">
-                <h4 className="text-sm font-black text-gray-800 flex items-center gap-1.5">
-                  <span className="text-lg">🦋</span>
-                  <span>小蝴蝶</span>
+                <h4 className="text-xs sm:text-sm font-black text-gray-800 flex items-center gap-1 sm:gap-1.5">
+                  <span className="text-base sm:text-lg">🦋</span>
+                  <span className="whitespace-nowrap">小蝴蝶</span>
                 </h4>
-                <p className="text-[11px] font-bold text-gray-500">
+                <p className="text-[10px] sm:text-[11px] font-bold text-gray-500 whitespace-nowrap">
                   已擁有 <span className="font-mono text-amber-700 font-black">{butterflyOwned}</span> 隻（上限 3 隻）
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 bg-amber-50/60 p-1.5 rounded-full border border-amber-200/80">
+              <div className="flex items-center gap-1 sm:gap-2 bg-amber-50/60 p-1 sm:p-1.5 rounded-full border border-amber-200/80">
                 <button
                   type="button"
                   disabled={butterflyDisplay <= 0}
                   onClick={() => handleUpdateCompanionDisplay('butterfly', -1)}
-                  className={`w-7 h-7 rounded-full font-black text-sm flex items-center justify-center transition border ${
+                  className={`w-5 h-5 sm:w-7 sm:h-7 rounded-full font-black text-xs sm:text-sm flex items-center justify-center transition border ${
                     butterflyDisplay > 0
                       ? 'bg-white text-amber-900 border-amber-300 hover:bg-amber-100 active:scale-90 cursor-pointer'
                       : 'bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed'
@@ -1373,16 +1373,16 @@ export default function GardenView({
                 >
                   −
                 </button>
-                <span className="w-5 text-center font-mono font-black text-xs text-gray-800">
+                <span className="w-4 text-center font-mono font-black text-[11px] sm:text-xs text-gray-800">
                   {butterflyDisplay}
                 </span>
                 <button
                   type="button"
                   disabled={butterflyDisplay >= butterflyOwned || butterflyDisplay >= 3}
                   onClick={() => handleUpdateCompanionDisplay('butterfly', 1)}
-                  className={`w-7 h-7 rounded-full font-black text-sm flex items-center justify-center transition border ${
+                  className={`w-5 h-5 sm:w-7 sm:h-7 rounded-full font-black text-xs sm:text-sm flex items-center justify-center transition border ${
                     butterflyDisplay < butterflyOwned && butterflyDisplay < 3
-                      ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600 active:scale-90 cursor-pointer shadow-xs'
+                      ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600 active:scale-90 cursor-pointer shadow-2xs'
                       : 'bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed'
                   }`}
                 >
@@ -1392,23 +1392,23 @@ export default function GardenView({
             </div>
 
             {/* 🐱 Cat */}
-            <div className="bg-white p-3.5 rounded-2xl border border-brand-sand shadow-xs flex items-center justify-between gap-3">
+            <div className="bg-white p-2 sm:p-3.5 rounded-xl sm:rounded-2xl border border-brand-sand shadow-2xs flex items-center justify-between gap-2 sm:gap-3">
               <div className="space-y-0.5 text-left flex-1">
-                <h4 className="text-sm font-black text-gray-800 flex items-center gap-1.5">
-                  <span className="text-lg">🐱</span>
-                  <span>小貓咪</span>
+                <h4 className="text-xs sm:text-sm font-black text-gray-800 flex items-center gap-1 sm:gap-1.5">
+                  <span className="text-base sm:text-lg">🐱</span>
+                  <span className="whitespace-nowrap">小貓咪</span>
                 </h4>
-                <p className="text-[11px] font-bold text-gray-500">
+                <p className="text-[10px] sm:text-[11px] font-bold text-gray-500 whitespace-nowrap">
                   已擁有 <span className="font-mono text-amber-700 font-black">{catOwned}</span> 隻（上限 1 隻）
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 bg-amber-50/60 p-1.5 rounded-full border border-amber-200/80">
+              <div className="flex items-center gap-1 sm:gap-2 bg-amber-50/60 p-1 sm:p-1.5 rounded-full border border-amber-200/80">
                 <button
                   type="button"
                   disabled={catDisplay <= 0}
                   onClick={() => handleUpdateCompanionDisplay('cat', -1)}
-                  className={`w-7 h-7 rounded-full font-black text-sm flex items-center justify-center transition border ${
+                  className={`w-5 h-5 sm:w-7 sm:h-7 rounded-full font-black text-xs sm:text-sm flex items-center justify-center transition border ${
                     catDisplay > 0
                       ? 'bg-white text-amber-900 border-amber-300 hover:bg-amber-100 active:scale-90 cursor-pointer'
                       : 'bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed'
@@ -1416,16 +1416,16 @@ export default function GardenView({
                 >
                   −
                 </button>
-                <span className="w-5 text-center font-mono font-black text-xs text-gray-800">
+                <span className="w-4 text-center font-mono font-black text-[11px] sm:text-xs text-gray-800">
                   {catDisplay}
                 </span>
                 <button
                   type="button"
                   disabled={catDisplay >= catOwned || catDisplay >= 1}
                   onClick={() => handleUpdateCompanionDisplay('cat', 1)}
-                  className={`w-7 h-7 rounded-full font-black text-sm flex items-center justify-center transition border ${
+                  className={`w-5 h-5 sm:w-7 sm:h-7 rounded-full font-black text-xs sm:text-sm flex items-center justify-center transition border ${
                     catDisplay < catOwned && catDisplay < 1
-                      ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600 active:scale-90 cursor-pointer shadow-xs'
+                      ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600 active:scale-90 cursor-pointer shadow-2xs'
                       : 'bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed'
                   }`}
                 >
@@ -1436,23 +1436,23 @@ export default function GardenView({
           </div>
 
           {/* Section 2: 🌸 花盆款式 */}
-          <div className="space-y-2.5 pt-2">
-            <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider px-1">
+          <div className="space-y-2 pt-1">
+            <h3 className="text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider px-1">
               🌸 花盆款式
             </h3>
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
               {pots.map((p) => {
                 const isEquipped = potTheme === p.id;
                 return (
                   <div
                     key={p.id}
-                    className={`p-3 rounded-2xl border flex flex-col justify-between gap-2 bg-white ${
+                    className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl border flex flex-col justify-between gap-1.5 sm:gap-2 bg-white ${
                       isEquipped ? 'border-amber-500 ring-2 ring-amber-400/30' : 'border-brand-sand'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{p.emoji}</span>
-                      <span className="text-xs font-black text-gray-800">{p.name}</span>
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <span className="text-base sm:text-xl">{p.emoji}</span>
+                      <span className="text-[11px] sm:text-xs font-black text-gray-800 whitespace-nowrap">{p.name}</span>
                     </div>
 
                     {p.unlocked ? (
@@ -1462,16 +1462,16 @@ export default function GardenView({
                           playClickSound(400, 'sine');
                           onUpdatePlantState({ ...plantState, potTheme: p.id as any });
                         }}
-                        className={`w-full py-1.5 rounded-xl text-xs font-black transition border-0 ${
+                        className={`w-full py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black transition border-0 whitespace-nowrap ${
                           isEquipped
-                            ? 'bg-amber-500 text-white shadow-xs'
+                            ? 'bg-amber-500 text-white shadow-2xs'
                             : 'bg-slate-100 text-slate-700 hover:bg-amber-100 cursor-pointer'
                         }`}
                       >
                         {isEquipped ? '使用中 ✨' : '替換'}
                       </button>
                     ) : (
-                      <div className="text-[11px] font-bold text-slate-400 bg-slate-50 py-1.5 px-2 rounded-xl text-center">
+                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-400 bg-slate-50 py-1 sm:py-1.5 px-1.5 sm:px-2 rounded-lg sm:rounded-xl text-center whitespace-nowrap">
                         🔒 尚未解鎖
                       </div>
                     )}
@@ -1482,21 +1482,21 @@ export default function GardenView({
           </div>
 
           {/* Section 3: 🏡 園藝裝飾 */}
-          <div className="space-y-2.5 pt-2">
-            <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider px-1">
+          <div className="space-y-2 pt-1">
+            <h3 className="text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider px-1">
               🏡 園藝裝飾
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               {decorations.map((d) => {
                 const isPlaced = activeDecorations.includes(d.id);
                 return (
                   <div
                     key={d.id}
-                    className="bg-white p-3.5 rounded-2xl border border-brand-sand shadow-xs flex items-center justify-between gap-3"
+                    className="bg-white p-2 sm:p-3.5 rounded-xl sm:rounded-2xl border border-brand-sand shadow-2xs flex items-center justify-between gap-2 sm:gap-3"
                   >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-xl">{d.emoji}</span>
-                      <span className="text-xs font-black text-gray-800">{d.name}</span>
+                    <div className="flex items-center gap-1.5 sm:gap-2.5">
+                      <span className="text-base sm:text-xl">{d.emoji}</span>
+                      <span className="text-[11px] sm:text-xs font-black text-gray-800 whitespace-nowrap">{d.name}</span>
                     </div>
 
                     {d.unlocked ? (
@@ -1509,16 +1509,16 @@ export default function GardenView({
                             : [...activeDecorations, d.id];
                           onUpdatePlantState({ ...plantState, activeDecorations: updated });
                         }}
-                        className={`px-4 py-1.5 rounded-full text-xs font-black transition border-0 ${
+                        className={`px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black transition border-0 whitespace-nowrap ${
                           isPlaced
-                            ? 'bg-emerald-500 text-white shadow-xs'
+                            ? 'bg-emerald-500 text-white shadow-2xs'
                             : 'bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer'
                         }`}
                       >
-                        {isPlaced ? '已擺放 ✨' : '未擺放 (點擊開啟)'}
+                        {isPlaced ? '已擺放 ✨' : '未擺放'}
                       </button>
                     ) : (
-                      <div className="text-[11px] font-bold text-slate-400 bg-slate-50 py-1.5 px-3 rounded-full">
+                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-400 bg-slate-50 py-1 sm:py-1.5 px-2.5 sm:px-3 rounded-full whitespace-nowrap">
                         🔒 尚未解鎖
                       </div>
                     )}
@@ -1529,8 +1529,8 @@ export default function GardenView({
           </div>
 
           {/* Tip Box */}
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
-            <p className="text-[11px] font-bold text-slate-500">
+          <div className="bg-slate-50 p-2 sm:p-3 rounded-xl border border-slate-200 text-center">
+            <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 whitespace-nowrap">
               💡 解鎖之裝飾與花盆可隨時在「花園管理」進行開啟與調整。
             </p>
           </div>

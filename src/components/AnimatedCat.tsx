@@ -109,14 +109,21 @@ export default function AnimatedCat({
       setCatMood(initialMood);
       setCatFullness(initialFullness);
       
-      if (initialMood === 'missYou') {
-        setTimeout(() => {
-          setCurrentMessage('你去咗邊呀？好掛住你 💕');
-          setShowMessage(true);
-          setCatMood('hungry');
-          setTimeout(() => setShowMessage(false), 4500);
-        }, 1500); // Small delay to let the app load visually first
-      }
+      // Auto display initial status speech bubble on load
+      setTimeout(() => {
+        if (initialMood === 'missYou') {
+          setCurrentMessage(language === 'en' ? 'Where have you been? I missed you so much 💕' : '你去咗邊呀？好掛住你啊 💕');
+          setExpression('curious');
+        } else if (initialMood === 'happy' || lastFed === todayStr) {
+          setCurrentMessage(language === 'en' ? 'I\'m full and super happy today! 😊 💕' : '今天吃得飽飽的，好開心！😊 💕');
+          setExpression('happy');
+        } else {
+          setCurrentMessage(language === 'en' ? 'I\'m so hungry 😿 Log your daily mood to get food for me!' : '肚子好餓喔 😿 記錄一下今日心情就可以獲取食物餵我啦！');
+          setExpression('confused');
+        }
+        setShowMessage(true);
+        setTimeout(() => setShowMessage(false), 4500);
+      }, 1500);
 
       if (lastLogin !== todayStr) {
         localStorage.setItem('cat_last_login', todayStr);
@@ -353,13 +360,60 @@ export default function AnimatedCat({
       setIsNaming(true);
       playClickSound(500, 'sine');
     } else {
-      const randomQuote = CAT_DIALOGUES[Math.floor(Math.random() * CAT_DIALOGUES.length)];
-      setCurrentMessage(randomQuote);
+      const todayStr = new Date().toISOString().split('T')[0];
+      const lastFed = localStorage.getItem('cat_last_fed');
+      const isFedToday = lastFed === todayStr || catMood === 'happy';
 
+      let statusDialogues: string[] = [];
+
+      if (catMood === 'missYou') {
+        statusDialogues = language === 'en' ? [
+          'Where have you been? I missed you so much 💕',
+          'You haven\'t visited in a while, I missed you! 😿💕',
+          'I missed you so much these days! 💕'
+        ] : [
+          '你去咗邊呀？好掛住你啊 💕',
+          '你好久沒來了，貓貓好想念你喔 😿💕',
+          '這幾天去哪裡了？好想好想你喔 💕'
+        ];
+      } else if (isFedToday) {
+        statusDialogues = language === 'en' ? [
+          'I\'m full and super happy today! 😊 💕',
+          'Thank you for feeding me! I feel great today 😊',
+          'My tummy is full and happy! 😊 ✨',
+          ...CAT_DIALOGUES
+        ] : [
+          '今天吃得飽飽的，好開心！😊 💕',
+          '謝謝你照顧我！今天心情真好 😊',
+          '肚子飽飽的，隨時準備為你加油！😊 ✨',
+          ...CAT_DIALOGUES
+        ];
+      } else {
+        statusDialogues = language === 'en' ? [
+          'I\'m so hungry 😿 Log your daily mood to get food for me!',
+          'My tummy is rumbling 😿 Record your mood today to earn food!',
+          'I\'m starving 😿 Tap "Record Mood" to get delicious food for me~',
+          ...CAT_DIALOGUES
+        ] : [
+          '肚子好餓喔 😿 記錄一下今日心情就可以獲取食物餵我啦！',
+          '咕嚕嚕⋯肚子餓了 😿 記得去「記錄心情」獲得美味食物喔！',
+          '貓貓肚子餓啦 😿 快去記錄心情賺取食物吧～',
+          ...CAT_DIALOGUES
+        ];
+      }
+
+      const randomQuote = statusDialogues[Math.floor(Math.random() * statusDialogues.length)];
+      setCurrentMessage(randomQuote);
       setShowMessage(true);
 
-      // Set happy or curious expression briefly on click
-      setExpression(Math.random() > 0.5 ? 'happy' : 'curious');
+      if (isFedToday) {
+        setExpression('happy');
+      } else if (catMood === 'missYou') {
+        setExpression('curious');
+      } else {
+        setExpression(Math.random() > 0.5 ? 'confused' : 'curious');
+      }
+
       playClickSound(500, 'sine');
 
       // Auto hide dialogue bubble after 4s
